@@ -323,6 +323,11 @@
         loadAdminProducts()
       }
       
+      // Actualizar historial de compras automáticamente
+      if (typeof loadUserPurchases === 'function') {
+        loadUserPurchases()
+      }
+      
     } catch (error) {
       console.error('Error processing purchase:', error)
       alert('Error al procesar la compra')
@@ -334,22 +339,22 @@
     const tbody = document.getElementById('userPurchasesTbody')
     if (!tbody) return
     
-    tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-bread-600">Cargando compras...</td></tr>'
+    tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-bread-600">Cargando compras...</td></tr>'
     
     try {
       const res = await fetch('/carrito/historial')
       if (!res.ok) {
         if (res.status === 401) {
-          tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-red-500">Debes iniciar sesión</td></tr>'
+          tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-red-500">Debes iniciar sesión</td></tr>'
         } else {
-          tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-red-500">Error al cargar compras</td></tr>'
+          tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-red-500">Error al cargar compras</td></tr>'
         }
         return
       }
       
       const purchases = await res.json()
       if (!purchases || purchases.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-gray-500">No tienes compras realizadas</td></tr>'
+        tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-gray-500">No tienes compras realizadas</td></tr>'
         return
       }
       
@@ -358,7 +363,6 @@
         const tr = document.createElement('tr')
         tr.className = 'border-b border-gray-100'
         tr.innerHTML = `
-          <td class="py-3 px-4 text-bread-700">#${purchase.id}</td>
           <td class="py-3 px-4 text-bread-700">${new Date(purchase.fecha).toLocaleDateString()}</td>
           <td class="py-3 px-4 text-bread-700">${purchase.total_productos} productos</td>
           <td class="py-3 px-4 text-bread-700">$${Number(purchase.total).toFixed(2)} MXN</td>
@@ -372,7 +376,7 @@
       })
     } catch (error) {
       console.error('Error loading user purchases:', error)
-      tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-red-500">Error al cargar compras</td></tr>'
+      tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-red-500">Error al cargar compras</td></tr>'
     }
   }
 
@@ -515,22 +519,22 @@
     const tbody = document.getElementById('userPurchasesTbodyPublic')
     if (!tbody) return
     
-    tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-bread-600">Cargando compras...</td></tr>'
+    tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-bread-600">Cargando compras...</td></tr>'
     
     try {
       const res = await fetch('/carrito/historial')
       if (!res.ok) {
         if (res.status === 401) {
-          tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-red-500">Debes iniciar sesión para ver tus compras</td></tr>'
+          tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-red-500">Debes iniciar sesión para ver tus compras</td></tr>'
         } else {
-          tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-red-500">Error al cargar compras</td></tr>'
+          tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-red-500">Error al cargar compras</td></tr>'
         }
         return
       }
       
       const purchases = await res.json()
       if (!purchases || purchases.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-gray-500">No tienes compras realizadas</td></tr>'
+        tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-gray-500">No tienes compras realizadas</td></tr>'
         return
       }
       
@@ -539,7 +543,6 @@
         const tr = document.createElement('tr')
         tr.className = 'border-b border-gray-100'
         tr.innerHTML = `
-          <td class="py-3 px-4 text-bread-700">#${purchase.id}</td>
           <td class="py-3 px-4 text-bread-700">${new Date(purchase.fecha).toLocaleDateString()}</td>
           <td class="py-3 px-4 text-bread-700">${purchase.total_productos} productos</td>
           <td class="py-3 px-4 text-bread-700">$${Number(purchase.total).toFixed(2)} MXN</td>
@@ -823,6 +826,12 @@
           const data = await res.json()
           cart = { items: [], total: 0 }
           persistCart(); updateCartTotal(); updateCartCount(); updateCartDisplay()
+          
+          // Actualizar historial de compras automáticamente
+          if (typeof loadUserPurchasesPublic === 'function') {
+            setTimeout(() => loadUserPurchasesPublic(), 500) // Pequeño delay para asegurar que la BD se actualice
+          }
+          
           try { globalThis.mostrarToast(data.mensaje || 'Compra realizada correctamente') } catch(e){}
         } catch (err) {
           console.error('Checkout error', err)
