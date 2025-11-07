@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Desesperanza - Panadería Artesanal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bread': {
+                            100: '#F0EBE3',
+                            200: '#DCC5A0',
+                            500: '#B8860B',
+                            600: '#8B4513',
+                            700: '#654321'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-bread-100">
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg p-8 max-w-md w-full">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-light text-bread-700">Iniciar Sesión</h2>
+                    <button onclick="closeModals()" class="text-bread-500 hover:text-bread-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form class="space-y-6" id="loginForm">
+                    <div>
+                                <label for="loginUsername" class="block text-sm font-medium text-bread-600">Usuario</label>
+                                <input type="text" id="loginUsername" name="username" required
+                                    class="mt-1 block w-full px-3 py-2 border border-bread-200 rounded-md shadow-sm focus:outline-none focus:ring-bread-500 focus:border-bread-500">
+                    </div>
+                    
+                    <div class="relative">
+                        <input type="password" id="loginPassword" name="password" required
+                            class="mt-1 block w-full pr-10 px-3 py-2 border border-bread-200 rounded-md shadow-sm focus:outline-none focus:ring-bread-500 focus:border-bread-500">
+                        <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-bread-500" data-toggle-target="loginPassword" aria-label="Mostrar contraseña">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div>
+                        <button type="submit"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-bread-500 hover:bg-bread-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bread-500 transition-colors duration-300">
+                            Iniciar Sesión
+                        </button>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm text-bread-600">
+                            ¿No tienes cuenta?
+                            <button type="button" onclick="showRegisterModal()" class="text-bread-500 hover:text-bread-700 font-medium">
+                                Regístrate
+                            </button>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="cartSidebar" class="fixed inset-y-0 right-0 w-96 bg-white shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out z-50">
+        <div class="flex flex-col h-full">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-light text-bread-700">Tu Carrito</h2>
+                    <button onclick="toggleCart()" class="text-bread-500 hover:text-bread-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-6 space-y-4" id="cartItems">
+                
+            </div>
+
+            <div class="border-t border-gray-200 p-6 space-y-4">
+                <div class="flex justify-between items-center text-lg">
+                    <span class="font-medium text-bread-700">Total</span>
+                    <span class="font-medium text-bread-700" id="cartTotal">0.00€</span>
+                </div>
+                <button onclick="checkout()" 
+                    class="w-full bg-bread-500 text-white py-3 px-4 rounded-lg hover:bg-bread-600 transition-colors duration-300">
+                    Realizar Pedido
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg p-8 max-w-md w-full">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-light text-bread-700">Registro</h2>
+                    <button onclick="closeModals()" class="text-bread-500 hover:text-bread-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form class="space-y-6" id="registerForm">
+                    <div>
+                        <label for="registerUsername" class="block text-sm font-medium text-bread-600">Usuario</label>
+                        <input type="text" id="registerUsername" name="username" required
+                            class="mt-1 block w-full px-3 py-2 border border-bread-200 rounded-md shadow-sm focus:outline-none focus:ring-bread-500 focus:border-bread-500">
+                    </div>
+                    <div class="relative">
+                        <label for="registerPassword" class="block text-sm font-medium text-bread-600">Contraseña</label>
+                        <input type="password" id="registerPassword" name="password" required
+                            class="mt-1 block w-full pr-10 px-3 py-2 border border-bread-200 rounded-md shadow-sm focus:outline-none focus:ring-bread-500 focus:border-bread-500">
+                        <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-bread-500" data-toggle-target="registerPassword" aria-label="Mostrar contraseña">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <label for="confirmPassword" class="block text-sm font-medium text-bread-600">Confirmar Contraseña</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required
+                            class="mt-1 block w-full pr-10 px-3 py-2 border border-bread-200 rounded-md shadow-sm focus:outline-none focus:ring-bread-500 focus:border-bread-500">
+                        <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-bread-500" data-toggle-target="confirmPassword" aria-label="Mostrar contraseña">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div>
+                        <button type="submit"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-bread-500 hover:bg-bread-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bread-500 transition-colors duration-300">
+                            Registrarse
+                        </button>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm text-bread-600">
+                            ¿Ya tienes cuenta?
+                            <button type="button" onclick="showLoginModal()" class="text-bread-500 hover:text-bread-700 font-medium">
+                                Inicia Sesión
+                            </button>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para detalles de compra -->
+    <div id="purchaseDetailModalPublic" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg p-8 max-w-2xl w-full max-h-screen overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-light text-bread-700">Detalles de Compra</h2>
+                    <button onclick="closePurchaseDetailModalPublic()" class="text-bread-500 hover:text-bread-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="purchaseDetailContentPublic">
+                    <p class="text-center text-gray-500">Cargando detalles...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bg-white shadow-sm py-6 sticky top-0 z-40">
+        <div class="container mx-auto flex justify-between items-center px-6">
+            <h1 class="text-2xl font-light tracking-wide text-bread-700">LA DESESPERANZA</h1>
+            <div class="flex items-center space-x-8">
+                <a href="#inicio" class="text-bread-600 hover:text-bread-700 text-sm uppercase tracking-wider">Inicio</a>
+                <a href="#productos" class="text-bread-600 hover:text-bread-700 text-sm uppercase tracking-wider">Productos</a>
+                <a href="#mis-compras" class="text-bread-600 hover:text-bread-700 text-sm uppercase tracking-wider">Mis Compras</a>
+                <a href="#contacto" class="text-bread-600 hover:text-bread-700 text-sm uppercase tracking-wider">Contacto</a>
+                <button onclick="toggleCart()" class="bg-bread-500 text-white p-2 rounded-full hover:bg-bread-600 transition-colors duration-300 relative">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cartCounter" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                </button>
+                <button id="loginBtn" onclick="showLoginModal()" 
+                    class="bg-transparent border-2 border-bread-500 text-bread-700 px-4 py-2 rounded-lg hover:bg-bread-500 hover:text-white transition-colors duration-300">
+                    <i class="fas fa-user mr-2"></i>Iniciar Sesión
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <section id="inicio" class="container mx-auto py-24 px-6">
+        <div class="max-w-3xl mx-auto text-center">
+            <h2 class="text-6xl font-light text-bread-700 mb-6 leading-tight">Artesanía en cada bocado</h2>
+            <p class="text-xl text-bread-600 mb-12">Tradición que se puede saborear desde 1925</p>
+            <a href="#productos" class="inline-block bg-bread-500 text-white px-12 py-4 hover:bg-bread-600 transition-colors duration-300 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                Descubrir
+            </a>
+        </div>
+    </section>
+
+    <section id="productos" class="py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-light text-center text-bread-700 mb-16">Productos Selectos</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                
+                <div class="bg-bread-100 p-8 rounded-xl group hover:shadow-xl transition-all duration-300">
+                    <div class="relative overflow-hidden rounded-lg mb-6">
+                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&h=500&fit=crop" 
+                             alt="Baguette" 
+                             class="w-full h-64 object-cover transform hover:scale-105 transition-transform duration-300">
+                    </div>
+                    <h3 class="text-xl font-light text-bread-700">Baguette Tradicional</h3>
+                    <p class="text-bread-600 mt-2">Pan crujiente horneado diariamente</p>
+                    <div class="flex justify-between items-center mt-6">
+                        <p class="text-bread-700 font-medium">2.50€</p>
+                        <button onclick="addToCart('Baguette Tradicional', 2.50, 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&h=500&fit=crop')" 
+                            class="bg-bread-500 text-white p-2 rounded-full hover:bg-bread-600 transform hover:scale-110 transition-all duration-300">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-bread-100 p-8 rounded-xl group hover:shadow-xl transition-all duration-300">
+                    <div class="relative overflow-hidden rounded-lg mb-6">
+                        <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=500&h=500&fit=crop" 
+                             alt="Croissant" 
+                             class="w-full h-64 object-cover transform hover:scale-105 transition-transform duration-300">
+                    </div>
+                    <h3 class="text-xl font-light text-bread-700">Croissant de Mantequilla</h3>
+                    <p class="text-bread-600 mt-2">Hojaldre artesanal francés</p>
+                    <div class="flex justify-between items-center mt-6">
+                        <p class="text-bread-700 font-medium">1.50€</p>
+                        <button onclick="addToCart('Croissant de Mantequilla', 1.50, 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=500&h=500&fit=crop')" 
+                            class="bg-bread-500 text-white p-2 rounded-full hover:bg-bread-600 transform hover:scale-110 transition-all duration-300">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-bread-100 p-8 rounded-xl group hover:shadow-xl transition-all duration-300">
+                    <div class="relative overflow-hidden rounded-lg mb-6">
+                        <img src="https://images.unsplash.com/photo-1583738712333-5a3df2aa3be1?w=500&h=500&fit=crop" 
+                             alt="Pan de Masa Madre" 
+                             class="w-full h-64 object-cover transform hover:scale-105 transition-transform duration-300">
+                    </div>
+                    <h3 class="text-xl font-light text-bread-700">Pan de Masa Madre</h3>
+                    <p class="text-bread-600 mt-2">Fermentación natural 24h</p>
+                    <div class="flex justify-between items-center mt-6">
+                        <p class="text-bread-700 font-medium">3.50€</p>
+                        <button onclick="addToCart('Pan de Masa Madre', 3.50, 'https://images.unsplash.com/photo-1583738712333-5a3df2aa3be1?w=500&h=500&fit=crop')" 
+                            class="bg-bread-500 text-white p-2 rounded-full hover:bg-bread-600 transform hover:scale-110 transition-all duration-300">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Mis Compras (solo visible para usuarios logueados) -->
+    <section id="mis-compras" class="py-24 bg-bread-100">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-light text-center text-bread-700 mb-16">Mis Compras</h2>
+            <div class="max-w-6xl mx-auto">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-light text-bread-700">Historial de Compras</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="text-left py-3 px-4 text-bread-600">ID</th>
+                                    <th class="text-left py-3 px-4 text-bread-600">Fecha</th>
+                                    <th class="text-left py-3 px-4 text-bread-600">Productos</th>
+                                    <th class="text-left py-3 px-4 text-bread-600">Total</th>
+                                    <th class="text-right py-3 px-4 text-bread-600">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userPurchasesTbodyPublic">
+                                <tr><td colspan="5" class="py-6 text-center text-bread-600">Inicia sesión para ver tus compras</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contacto" class="container mx-auto py-24 px-6">
+        <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-12">
+            <h2 class="text-3xl font-light text-center text-bread-700 mb-16">Visítanos</h2>
+            <div class="space-y-8 text-center">
+                <div class="hover:transform hover:scale-105 transition-transform duration-300">
+                    <p class="text-sm uppercase tracking-wider text-bread-500 mb-2">Dirección</p>
+                    <p class="text-bread-700">Calle del Pan 123, Ciudad</p>
+                </div>
+                <div class="hover:transform hover:scale-105 transition-transform duration-300">
+                    <p class="text-sm uppercase tracking-wider text-bread-500 mb-2">Horario</p>
+                    <p class="text-bread-700">Lunes a Sábado<br>7:00 - 20:00</p>
+                </div>
+                <div class="hover:transform hover:scale-105 transition-transform duration-300">
+                    <p class="text-sm uppercase tracking-wider text-bread-500 mb-2">Teléfono</p>
+                    <p class="text-bread-700">+34 123 456 789</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-bread-700 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 LA DESESPERANZA. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="validacion.js"></script>
+    <script src="main/main.js"></script>
+</body>
+</html>
