@@ -5,21 +5,33 @@ const MySQLStore = require('express-mysql-session')(session)
 const mysql = require('mysql2/promise')
 const path = require('path')
 
+// Validar variables de entorno críticas
+const requiredEnvVars = ['MYSQL_HOST', 'MYSQL_USER', 'MYSQL_DATABASE', 'SESSION_SECRET']
+const missingVars = requiredEnvVars.filter(varName => !process.env[varName])
+
+if (missingVars.length > 0) {
+	console.error('❌ Variables de entorno faltantes:', missingVars.join(', '))
+	console.log('💡 Asegúrate de que el archivo .env existe y contiene todas las variables necesarias')
+	process.exit(1)
+}
+
 const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 // Conexión a MySQL
 const pool = mysql.createPool({
-	host: process.env.MYSQL_HOST || 'localhost',
-	user: process.env.MYSQL_USER || 'root',
-	password: process.env.MYSQL_PASSWORD || 'n0m3l0',
-	database: process.env.MYSQL_DATABASE || 'panaderia',
+	host: process.env.MYSQL_HOST,
+	port: process.env.MYSQL_PORT || 40609,
+	user: process.env.MYSQL_USER,
+	password: process.env.MYSQL_PASSWORD,
+	database: process.env.MYSQL_DATABASE,
 	waitForConnections: true,
 	connectionLimit: 10,
 	queueLimit: 0,
 	acquireTimeout: 60000,
-	timeout: 60000
+	timeout: 60000,
+	ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 })
 
 // Verificar conexión a MySQL
@@ -37,12 +49,12 @@ const sessionStore = new MySQLStore({}, pool)
 
 app.use(session({
 	key: 'sid',
-	secret: process.env.SESSION_SECRET || 'miclave',
+	secret: process.env.SESSION_SECRET,
 	store: sessionStore,
 	resave: false,
 	saveUninitialized: false,
 	cookie: {
-		maxAge: 1000 * 60 * 60 * 24,
+		maxAge: 1000 * 60 * 60 * 24, // 24 horas
 		httpOnly: true,
 		secure: false,
 		sameSite: 'lax'
