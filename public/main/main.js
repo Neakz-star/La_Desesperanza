@@ -512,6 +512,50 @@
     }
   }
 
+  // Función para cerrar el modal de detalles en la página pública
+  globalThis.closePurchaseDetailModalPublic = function() {
+    const modal = document.getElementById('purchaseDetailModalPublic')
+    if (modal) {
+      modal.classList.add('hidden')
+      document.body.style.overflow = 'auto'
+    }
+  }
+
+  // Agregar funcionalidad para cerrar modales haciendo clic fuera del contenido
+  document.addEventListener('DOMContentLoaded', function() {
+    // Modal para detalles de compra (admin)
+    const purchaseModal = document.getElementById('purchaseDetailModal')
+    if (purchaseModal) {
+      purchaseModal.addEventListener('click', function(e) {
+        if (e.target === purchaseModal) {
+          closePurchaseDetailModal()
+        }
+      })
+    }
+
+    // Modal para detalles de compra (público)
+    const purchaseModalPublic = document.getElementById('purchaseDetailModalPublic')
+    if (purchaseModalPublic) {
+      purchaseModalPublic.addEventListener('click', function(e) {
+        if (e.target === purchaseModalPublic) {
+          closePurchaseDetailModalPublic()
+        }
+      })
+    }
+
+    // También agregar escape key para cerrar modales
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        if (purchaseModal && !purchaseModal.classList.contains('hidden')) {
+          closePurchaseDetailModal()
+        }
+        if (purchaseModalPublic && !purchaseModalPublic.classList.contains('hidden')) {
+          closePurchaseDetailModalPublic()
+        }
+      }
+    })
+  })
+
   // Funciones específicas para la página pública (index.html)
   
   // Función para cargar compras del usuario en la página pública
