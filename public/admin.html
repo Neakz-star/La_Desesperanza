@@ -61,40 +61,8 @@
     <section id="productos" class="py-24 bg-white">
         <div class="container mx-auto px-6">
             <h2 class="text-4xl font-light text-center text-bread-700 mb-16">Productos Selectos</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-                <div class="bg-bread-100 p-8 rounded-xl group hover:shadow-xl transition-all duration-300">
-                    <div class="relative overflow-hidden rounded-lg mb-6">
-                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&h=500&fit=crop" alt="Baguette" class="w-full h-64 object-cover transform hover:scale-105 transition-transform duration-300">
-                    </div>
-                    <h3 class="text-xl font-light text-bread-700">Baguette Tradicional</h3>
-                    <p class="text-bread-600 mt-2">Pan crujiente horneado diariamente</p>
-                    <div class="flex justify-between items-center mt-6">
-                        <p class="text-bread-700 font-medium">2.50€</p>
-                        <button onclick="addToCart('Baguette Tradicional', 2.50, 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&h=500&fit=crop')" class="bg-bread-500 text-white p-2 rounded-full hover:bg-bread-600 transform hover:scale-110 transition-all duration-300"><i class="fas fa-plus"></i></button>
-                    </div>
-                </div>
-                <div class="bg-bread-100 p-8 rounded-xl group hover:shadow-xl transition-all duration-300">
-                    <div class="relative overflow-hidden rounded-lg mb-6">
-                        <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=500&h=500&fit=crop" alt="Croissant" class="w-full h-64 object-cover transform hover:scale-105 transition-transform duration-300">
-                    </div>
-                    <h3 class="text-xl font-light text-bread-700">Croissant de Mantequilla</h3>
-                    <p class="text-bread-600 mt-2">Hojaldre artesanal francés</p>
-                    <div class="flex justify-between items-center mt-6">
-                        <p class="text-bread-700 font-medium">1.50€</p>
-                        <button onclick="addToCart('Croissant de Mantequilla', 1.50, 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=500&h=500&fit=crop')" class="bg-bread-500 text-white p-2 rounded-full hover:bg-bread-600 transform hover:scale-110 transition-all duration-300"><i class="fas fa-plus"></i></button>
-                    </div>
-                </div>
-                <div class="bg-bread-100 p-8 rounded-xl group hover:shadow-xl transition-all duration-300">
-                    <div class="relative overflow-hidden rounded-lg mb-6">
-                        <img src="https://images.unsplash.com/photo-1583738712333-5a3df2aa3be1?w=500&h=500&fit=crop" alt="Pan de Masa Madre" class="w-full h-64 object-cover transform hover:scale-105 transition-transform duration-300">
-                    </div>
-                    <h3 class="text-xl font-light text-bread-700">Pan de Masa Madre</h3>
-                    <p class="text-bread-600 mt-2">Fermentación natural 24h</p>
-                    <div class="flex justify-between items-center mt-6">
-                        <p class="text-bread-700 font-medium">3.50€</p>
-                        <button onclick="addToCart('Pan de Masa Madre', 3.50, 'https://images.unsplash.com/photo-1583738712333-5a3df2aa3be1?w=500&h=500&fit=crop')" class="bg-bread-500 text-white p-2 rounded-full hover:bg-bread-600 transform hover:scale-110 transition-all duration-300"><i class="fas fa-plus"></i></button>
-                    </div>
-                </div>
+            <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <!-- Los productos se cargarán dinámicamente desde la base de datos -->
             </div>
         </div>
     </section>
@@ -156,37 +124,7 @@
                             </tr>
                         </thead>
                         <tbody id="adminProductsTbody">
-                            <tr class="border-b border-gray-100">
-                                <td class="py-3 px-4">
-                                    <div class="flex items-center">
-                                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff" 
-                                             alt="Baguette" 
-                                             class="w-10 h-10 rounded object-cover mr-3">
-                                        <div>
-                                            <p class="text-bread-700">Baguette Tradicional</p>
-                                            <p class="text-sm text-bread-600">Pan crujiente</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-3 px-4 text-bread-700">2.50€</td>
-                                <td class="py-3 px-4 text-bread-700">45</td>
-                                <td class="py-3 px-4">
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                                        Activo
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4">
-                                    <div class="flex justify-end space-x-2">
-                                        <button class="text-bread-500 hover:text-bread-700">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-500 hover:text-red-700">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            
+                            <!-- Los productos se cargarán dinámicamente -->
                         </tbody>
                     </table>
                 </div>
