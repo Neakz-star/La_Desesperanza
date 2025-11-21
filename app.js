@@ -4,6 +4,8 @@ const session = require('express-session')
 const MySQLStore = require('express-mysql-session')(session)
 const mysql = require('mysql2/promise')
 const path = require('path')
+const http = require('http')
+const { Server } = require('socket.io')
 
 // Validar variables de entorno críticas
 const requiredEnvVars = ['MYSQL_HOST', 'MYSQL_USER', 'MYSQL_DATABASE', 'SESSION_SECRET']
@@ -69,8 +71,56 @@ app.use(express.static(path.join(__dirname, '/public'), {
     }
 }))
 
+// Socket.io - Manejo de conexiones en tiempo real
+const server = http.createServer(app)
+const io = new Server(server)
+
+io.on('connection', (socket) => {
+    console.log('🔌 Nuevo usuario conectado:', socket.id)
+
+    // Recibir coordenadas del usuario
+    socket.on('userCoordinates', (coords) => {
+        console.log('📍 Coordenadas recibidas de', socket.id, ':', coords)
+        // Emitir a todos los demás usuarios (broadcast)
+        socket.broadcast.emit('userNewCoordinates', {
+            id: socket.id,
+            coords: coords
+        })
+    })
+
+    // Usuario desconectado
+    socket.on('disconnect', () => {
+        console.log('🔌 Usuario desconectado:', socket.id)
+        // Notificar a otros usuarios que este usuario se desconectó
+        socket.broadcast.emit('userDisconnected', socket.id)
+    })
+})
+
 const carritoRoutes = require('./routes/carrito')(pool)
 app.use('/carrito', carritoRoutes)
+
+app.get('/api/productos', async (req, res) => {
+    try {
+        const [productos] = await pool.query(`
+            SELECT id, nombre, descripcion, tipo, precio, stock, img, temporada, activo 
+            FROM productos 
+            WHERE activo = 1 AND stock > 0
+            ORDER BY temporada, nombre
+        `)
+        
+        const grouped = productos.reduce((acc, prod) => {
+            const season = prod.temporada || 'General'
+            if (!acc[season]) acc[season] = []
+            acc[season].push(prod)
+            return acc
+        }, {})
+        
+        res.json(grouped)
+    } catch (error) {
+        console.error('Error al obtener productos:', error)
+        res.status(500).json({ error: 'Error al obtener productos' })
+    }
+})
 
 // Rutas de autenticación
 app.post('/login', async (req, res) => {
@@ -579,28 +629,30 @@ const port = process.env.PORT || 3000
 
 // Manejo de errores no capturados
 process.on('uncaughtException', (err) => {
-	console.error('❌ Error no capturado:', err)
-	console.log('🔄 El servidor continúa ejecutándose...')
+    console.error('❌ Error no capturado:', err)
+    console.log('🔄 El servidor continúa ejecutándose...')
 })
 
 process.on('unhandledRejection', (reason, promise) => {
-	console.error('❌ Promesa rechazada no manejada:', reason)
-	console.log('🔄 El servidor continúa ejecutándose...')
+    console.error('❌ Promesa rechazada no manejada:', reason)
+    console.log('🔄 El servidor continúa ejecutándose...')
 })
 
-const server = app.listen(port, () => {
-	console.log(`🚀 Servidor en http://localhost:${port}`)
-	console.log(`📁 Archivos estáticos desde: ${path.join(__dirname, 'public')}`)
-	console.log(`🌐 Imágenes ahora se manejan por URL externa`)
+// IMPORTANTE: Cambiar app.listen por server.listen para que Socket.io funcione
+server.listen(port, () => {
+    console.log(`🚀 Servidor en http://localhost:${port}`)
+    console.log(`📁 Archivos estáticos desde: ${path.join(__dirname, 'public')}`)
+    console.log(`🌐 Imágenes ahora se manejan por URL externa`)
+    console.log(`🔌 Socket.io activado para ubicaciones en tiempo real`)
 })
 
 server.on('error', (err) => {
-	if (err.code === 'EADDRINUSE') {
-		console.error(`❌ Puerto ${port} ya está en uso`)
-		console.log('💡 Intenta usar otro puerto o cerrar el proceso que lo está usando')
-		process.exit(1)
-	} else {
-		console.error('❌ Error del servidor:', err)
-	}
+    if (err.code === 'EADDRINUSE') {
+        console.error(`❌ Puerto ${port} ya está en uso`)
+        console.log('💡 Intenta usar otro puerto o cerrar el proceso que lo está usando')
+        process.exit(1)
+    } else {
+        console.error('❌ Error del servidor:', err)
+    }
 })
 

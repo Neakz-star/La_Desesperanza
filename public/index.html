@@ -6,6 +6,7 @@
     <title>La Desesperanza - Panadería Artesanal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
     <script>
         tailwind.config = {
             theme: {
@@ -280,21 +281,34 @@
         </div>
     </section>
 
-    <section id="contacto" class="container mx-auto py-24 px-6">
-        <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-12">
-            <h2 class="text-3xl font-light text-center text-bread-700 mb-16">Visítanos</h2>
-            <div class="space-y-8 text-center">
-                <div class="hover:transform hover:scale-105 transition-transform duration-300">
-                    <p class="text-sm uppercase tracking-wider text-bread-500 mb-2">Dirección</p>
-                    <p class="text-bread-700">Calle del Pan 123, Ciudad</p>
+    <section id="contacto" class="py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-light text-center text-bread-700 mb-16">Visítanos</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                <!-- Información de contacto -->
+                <div class="bg-bread-100 rounded-2xl shadow-lg p-12">
+                    <h3 class="text-2xl font-light text-bread-700 mb-8">Información</h3>
+                    <div class="space-y-8">
+                        <div class="hover:transform hover:scale-105 transition-transform duration-300">
+                            <p class="text-sm uppercase tracking-wider text-bread-500 mb-2">Dirección</p>
+                            <p class="text-bread-700">Av. Dr. Gustavo Baz 185, Hacienda de Echegaray, 53300 Naucalpan de Juárez, Méx.</p>
+                        </div>
+                        <div class="hover:transform hover:scale-105 transition-transform duration-300">
+                            <p class="text-sm uppercase tracking-wider text-bread-500 mb-2">Horario</p>
+                            <p class="text-bread-700">Lunes a Sábado<br>7:00 - 20:00</p>
+                        </div>
+                        <div class="hover:transform hover:scale-105 transition-transform duration-300">
+                            <p class="text-sm uppercase tracking-wider text-bread-500 mb-2">Teléfono</p>
+                            <p class="text-bread-700">+34 123 456 789</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="hover:transform hover:scale-105 transition-transform duration-300">
-                    <p class="text-sm uppercase tracking-wider text-bread-500 mb-2">Horario</p>
-                    <p class="text-bread-700">Lunes a Sábado<br>7:00 - 20:00</p>
-                </div>
-                <div class="hover:transform hover:scale-105 transition-transform duration-300">
-                    <p class="text-sm uppercase tracking-wider text-bread-500 mb-2">Teléfono</p>
-                    <p class="text-bread-700">+34 123 456 789</p>
+                
+                <!-- Mapa -->
+                <div class="bg-bread-100 rounded-2xl shadow-lg p-8">
+                    <h3 class="text-2xl font-light text-bread-700 mb-4">Ubicación en Tiempo Real</h3>
+                    <div id="map" class="w-full h-96 rounded-lg border-2 border-bread-200 relative z-0"></div>
+                    <p class="text-xs text-gray-500 mt-2">🔴 Marcadores en tiempo real de otros usuarios</p>
                 </div>
             </div>
         </div>
@@ -306,6 +320,10 @@
         </div>
     </footer>
 
+    <!-- Scripts al final del body -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+    <script src="scripts/mapa/map.js"></script>
     <script src="validacion.js"></script>
     <script src="main/main.js"></script>
 </body>
