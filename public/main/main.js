@@ -1689,18 +1689,22 @@
           })
           
           if (!res.ok) {
-            const error = await res.json()
-            mostrarToast(error.mensaje || 'Error al actualizar saldo')
+            try {
+              const error = await res.json()
+              mostrarToast(error.mensaje || 'Error al actualizar saldo')
+            } catch {
+              mostrarToast('Error al actualizar saldo')
+            }
             return
           }
           
           const data = await res.json()
-          mostrarToast(`✅ Saldo actualizado: $${data.nuevoSaldo}`)
+          mostrarToast(`✅ Saldo actualizado: $${Number(data.nuevoSaldo).toFixed(2)}`)
           closeEditSaldoModal()
           await loadAdminUsers()
         } catch (err) {
-          console.error(err)
-          mostrarToast('Error al actualizar saldo')
+          console.error('Error en la solicitud:', err)
+          mostrarToast('Error de conexión al actualizar saldo')
         }
       })
     }
