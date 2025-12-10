@@ -1695,7 +1695,7 @@
           }
           
           const data = await res.json()
-          mostrarToast(`✅ Saldo actualizado: $${data.nuevoSaldo.toFixed(2)}`)
+          mostrarToast(`✅ Saldo actualizado: $${data.nuevoSaldo}`)
           closeEditSaldoModal()
           await loadAdminUsers()
         } catch (err) {

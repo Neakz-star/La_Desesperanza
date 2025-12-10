@@ -486,12 +486,12 @@ app.post('/admin/users/:id/update-saldo', requireAdmin, async (req, res) => {
 		
 		console.log('✅ Admin actualizó saldo:', {
 			userId: userId,
-			nuevoSaldo: saldoNum.toFixed(2)
+			nuevoSaldo: saldoNum
 		})
 		
 		res.json({ 
 			mensaje: 'Saldo actualizado correctamente',
-			nuevoSaldo: saldoNum.toFixed(2)
+			nuevoSaldo: saldoNum
 		})
 	} catch (err) {
 		console.error('Error updating user saldo:', err)
