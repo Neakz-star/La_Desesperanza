@@ -284,11 +284,11 @@
         </div>
     </nav>
 
-    <section id="inicio" class="container mx-auto py-24 px-6">
+    <section id="inicio" class="container mx-auto py-24 px-6" style="background: linear-gradient(135deg, #FFE5E5 0%, #FFF0F0 100%);">
         <div class="max-w-3xl mx-auto text-center">
             <h2 class="text-6xl font-light text-bread-700 mb-6 leading-tight">Artesanía en cada bocado</h2>
             <p class="text-xl text-bread-600 mb-12">Tradición que se puede saborear desde 1925</p>
-            <a href="#productos" class="inline-block bg-bread-500 text-white px-12 py-4 hover:bg-bread-600 transition-colors duration-300 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1">
+            <a href="#productos" class="inline-block bg-christmas-red text-white px-12 py-4 hover:bg-bread-500 transition-colors duration-300 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1">
                 Descubrir
             </a>
         </div>
@@ -304,14 +304,14 @@
     </section>
 
     <!-- Sección de Mis Compras (solo visible para usuarios logueados) -->
-    <section id="mis-compras" class="py-24 bg-bread-100">
+    <section id="mis-compras" class="py-24" style="background: linear-gradient(135deg, #FFE5E5 0%, #FFF0F0 100%);">
         <div class="container mx-auto px-6">
             <h2 class="text-4xl font-light text-center text-bread-700 mb-16">Mis Compras</h2>
             <div class="max-w-6xl mx-auto">
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <div class="mb-6 flex justify-between items-center">
                         <h3 class="text-xl font-light text-bread-700">Historial de Compras</h3>
-                        <button onclick="loadUserPurchasesPublic()" class="bg-bread-500 text-white px-4 py-2 rounded hover:bg-bread-600 transition-colors">
+                        <button onclick="loadUserPurchasesPublic()" class="bg-christmas-red text-white px-4 py-2 rounded hover:bg-bread-500 transition-colors">
                             <i class="fas fa-sync-alt mr-2"></i>Actualizar
                         </button>
                     </div>
@@ -340,26 +340,26 @@
             <h2 class="text-4xl font-light text-center text-bread-700 mb-16">Visítanos</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                 <!-- Información de contacto -->
-                <div class="bg-bread-100 rounded-2xl shadow-lg p-12">
+                <div class="bg-white rounded-2xl shadow-lg p-12 border-2 border-red-100">
                     <h3 class="text-2xl font-light text-bread-700 mb-8">Información</h3>
                     <div class="space-y-8">
                         <div class="hover:transform hover:scale-105 transition-transform duration-300">
-                            <p class="text-sm uppercase tracking-wider text-bread-500 mb-2">Dirección</p>
+                            <p class="text-sm uppercase tracking-wider text-christmas-red mb-2">Dirección</p>
                             <p class="text-bread-700">Av. Dr. Gustavo Baz 185, Hacienda de Echegaray, 53300 Naucalpan de Juárez, Méx.</p>
                         </div>
                         <div class="hover:transform hover:scale-105 transition-transform duration-300">
-                            <p class="text-sm uppercase tracking-wider text-bread-500 mb-2">Horario</p>
+                            <p class="text-sm uppercase tracking-wider text-christmas-red mb-2">Horario</p>
                             <p class="text-bread-700">Lunes a Sábado<br>7:00 - 20:00</p>
                         </div>
                         <div class="hover:transform hover:scale-105 transition-transform duration-300">
-                            <p class="text-sm uppercase tracking-wider text-bread-500 mb-2">Teléfono</p>
+                            <p class="text-sm uppercase tracking-wider text-christmas-red mb-2">Teléfono</p>
                             <p class="text-bread-700">+34 123 456 789</p>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Mapa -->
-                <div class="bg-bread-100 rounded-2xl shadow-lg p-8">
+                <div class="bg-white rounded-2xl shadow-lg p-8 border-2 border-red-100">
                     <h3 class="text-2xl font-light text-bread-700 mb-4">Ubicación en Tiempo Real</h3>
                     <div id="map" class="w-full h-96 rounded-lg border-2 border-bread-200 relative z-0"></div>
                     <p class="text-xs text-gray-500 mt-2">🔴 Marcadores en tiempo real de otros usuarios</p>
