@@ -266,7 +266,10 @@ app.post('/saldo/agregar', async (req, res) => {
 
 		// Validar límite máximo
 		if (nuevoSaldo > 999999999999) {
-			return res.status(400).json({ mensaje: 'El saldo no puede superar $999,999,999,999' })
+			return res.status(400).json({ 
+				success: false,
+				mensaje: 'La suma del saldo actual ($' + saldoActual.toFixed(2) + ') más el monto a agregar ($' + montoNum.toFixed(2) + ') supera el máximo permitido de $999,999,999,999'
+			})
 		}
 
 		// Actualizar saldo

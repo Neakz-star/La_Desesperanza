@@ -91,6 +91,37 @@ module.exports = function(pool) {
         const [compraResult] = await conn.execute('INSERT INTO compras (id_usuario, total) VALUES (?, ?)', [userId, total])
         const compraId = compraResult.insertId
         
+        // Obtener saldo actual del usuario
+        const [userRows] = await conn.execute('SELECT sueldo FROM usuario WHERE id = ?', [userId])
+        
+        if (userRows.length === 0) {
+          await conn.rollback()
+          conn.release()
+          return res.status(404).json({ mensaje: 'Usuario no encontrado' })
+        }
+        
+        const saldoActual = Number(userRows[0].sueldo) || 0
+        
+        // Validar que el usuario tenga saldo suficiente
+        if (saldoActual < total) {
+          await conn.rollback()
+          conn.release()
+          return res.status(400).json({ 
+            mensaje: `Saldo insuficiente. Saldo actual: $${saldoActual.toFixed(2)}, Total de compra: $${total.toFixed(2)}` 
+          })
+        }
+        
+        // Descontar el total del saldo del usuario
+        const nuevoSaldo = saldoActual - total
+        await conn.execute('UPDATE usuario SET sueldo = ? WHERE id = ?', [nuevoSaldo, userId])
+        
+        console.log('💰 Saldo descontado:', {
+          userId: userId,
+          saldoAnterior: saldoActual.toFixed(2),
+          totalCompra: total.toFixed(2),
+          nuevoSaldo: nuevoSaldo.toFixed(2)
+        })
+        
         // Crear los detalles de la compra y actualizar stock
         for (const producto of productosValidados) {
           const { pid, qty, price } = producto
@@ -108,7 +139,14 @@ module.exports = function(pool) {
         await conn.commit()
         conn.release()
         
-        return res.json({ mensaje: 'Compra registrada', compraId: compraId, total })
+        return res.json({ 
+          mensaje: 'Compra realizada exitosamente', 
+          compraId: compraId, 
+          total: total,
+          saldoAnterior: saldoActual.toFixed(2),
+          nuevoSaldo: nuevoSaldo.toFixed(2),
+          saldoDescontado: total.toFixed(2)
+        })
       } catch (err) {
         await conn.rollback().catch(()=>{})
         conn.release()

@@ -419,7 +419,16 @@
       }
       
       const data = await res.json()
-      mostrarToast('Compra realizada exitosamente')
+      
+      // Mostrar notificación con información del saldo
+      if (data.saldoDescontado && data.nuevoSaldo) {
+        mostrarToast(`¡Compra exitosa! -$${parseFloat(data.saldoDescontado).toLocaleString('es-MX', { minimumFractionDigits: 2 })} • Nuevo saldo: $${parseFloat(data.nuevoSaldo).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 4000)
+      } else {
+        mostrarToast('Compra realizada exitosamente')
+      }
+      
+      // Actualizar saldo en la UI
+      try { await actualizarSaldoDisplay() } catch(e) { console.debug('Error actualizando saldo:', e) }
       
       // Limpiar carrito
       adminCart.items = []
@@ -1001,12 +1010,23 @@
           cart = { items: [], total: 0 }
           persistCart(); updateCartTotal(); updateCartCount(); updateCartDisplay()
           
+          // Mostrar notificación con información del saldo
+          if (data.saldoDescontado && data.nuevoSaldo) {
+            try { 
+              globalThis.mostrarToast(`¡Compra exitosa! -$${parseFloat(data.saldoDescontado).toLocaleString('es-MX', { minimumFractionDigits: 2 })} • Nuevo saldo: $${parseFloat(data.nuevoSaldo).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 4000)
+            } catch(e){}
+          } else {
+            try { globalThis.mostrarToast(data.mensaje || 'Compra realizada correctamente') } catch(e){}
+          }
+          
+          // Actualizar saldo en la UI
+          try { await actualizarSaldoDisplay() } catch(e) { console.debug('Error actualizando saldo:', e) }
+          
           // Actualizar historial de compras automáticamente
           if (typeof loadUserPurchasesPublic === 'function') {
             setTimeout(() => loadUserPurchasesPublic(), 500) // Pequeño delay para asegurar que la BD se actualice
           }
           
-          try { globalThis.mostrarToast(data.mensaje || 'Compra realizada correctamente') } catch(e){}
         } catch (err) {
           console.error('Checkout error', err)
           alert('Error al conectar con el servidor')
