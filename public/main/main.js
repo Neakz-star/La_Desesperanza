@@ -420,12 +420,8 @@
       
       const data = await res.json()
       
-      // Mostrar notificación con información del saldo
-      if (data.saldoDescontado && data.nuevoSaldo) {
-        mostrarToast(`¡Compra exitosa! -$${parseFloat(data.saldoDescontado).toLocaleString('es-MX', { minimumFractionDigits: 2 })} • Nuevo saldo: $${parseFloat(data.nuevoSaldo).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 4000)
-      } else {
-        mostrarToast('Compra realizada exitosamente')
-      }
+      // Mostrar notificación con botón de ticket
+      mostrarToastConTicket('Compra exitosa', data.compraId)
       
       // Actualizar saldo en la UI
       try { await actualizarSaldoDisplay() } catch(e) { console.debug('Error actualizando saldo:', e) }
@@ -487,8 +483,11 @@
           <td class="py-3 px-4 text-bread-700">${purchase.total_productos} productos</td>
           <td class="py-3 px-4 text-bread-700">$${Number(purchase.total).toFixed(2)} MXN</td>
           <td class="py-3 px-4 text-right">
-            <button onclick="showPurchaseDetails(${purchase.id})" class="bg-bread-500 text-white px-3 py-1 rounded hover:bg-bread-600 transition-colors">
+            <button onclick="showPurchaseDetails(${purchase.id})" class="bg-bread-500 text-white px-3 py-1 rounded hover:bg-bread-600 transition-colors mr-2">
               Ver Detalles
+            </button>
+            <button onclick="mostrarTicket(${purchase.id})" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition-colors">
+              <i class="fas fa-ticket-alt mr-1"></i>Ticket
             </button>
           </td>
         `
@@ -535,8 +534,11 @@
           <td class="py-3 px-4 text-bread-700">${purchase.total_productos} productos</td>
           <td class="py-3 px-4 text-bread-700">$${Number(purchase.total).toFixed(2)} MXN</td>
           <td class="py-3 px-4 text-right">
-            <button onclick="showPurchaseDetailsAdmin(${purchase.id})" class="bg-bread-500 text-white px-3 py-1 rounded hover:bg-bread-600 transition-colors">
+            <button onclick="showPurchaseDetailsAdmin(${purchase.id})" class="bg-bread-500 text-white px-3 py-1 rounded hover:bg-bread-600 transition-colors mr-2">
               Ver Detalles
+            </button>
+            <button onclick="mostrarTicket(${purchase.id})" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition-colors">
+              <i class="fas fa-ticket-alt mr-1"></i>Ticket
             </button>
           </td>
         `
@@ -730,8 +732,11 @@
           <td class="py-3 px-4 text-bread-700">${purchase.total_productos} productos</td>
           <td class="py-3 px-4 text-bread-700">$${Number(purchase.total).toFixed(2)} MXN</td>
           <td class="py-3 px-4 text-right">
-            <button onclick="showPurchaseDetailsPublic(${purchase.id})" class="bg-bread-500 text-white px-3 py-1 rounded hover:bg-bread-600 transition-colors">
+            <button onclick="showPurchaseDetailsPublic(${purchase.id})" class="bg-bread-500 text-white px-3 py-1 rounded hover:bg-bread-600 transition-colors mr-2">
               Ver Detalles
+            </button>
+            <button onclick="mostrarTicket(${purchase.id})" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition-colors">
+              <i class="fas fa-ticket-alt mr-1"></i>Ticket
             </button>
           </td>
         `
@@ -884,6 +889,166 @@
     } catch(e){ console.debug('toast error', e) }
   }
 
+  // Toast con botón de ticket
+  globalThis.mostrarToastConTicket = function(message, compraId, duration = 4000) {
+    try {
+      const t = document.createElement('div')
+      t.style.position = 'fixed'
+      t.style.right = '16px'
+      t.style.top = '16px'
+      t.style.background = '#8B5E34'
+      t.style.color = 'white'
+      t.style.padding = '10px 14px'
+      t.style.borderRadius = '8px'
+      t.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'
+      t.style.zIndex = 9999
+      t.style.display = 'flex'
+      t.style.alignItems = 'center'
+      t.style.gap = '12px'
+      
+      const textSpan = document.createElement('span')
+      textSpan.textContent = message
+      t.appendChild(textSpan)
+      
+      const ticketBtn = document.createElement('button')
+      ticketBtn.textContent = 'Ticket'
+      ticketBtn.style.background = 'white'
+      ticketBtn.style.color = '#8B5E34'
+      ticketBtn.style.border = 'none'
+      ticketBtn.style.padding = '4px 12px'
+      ticketBtn.style.borderRadius = '4px'
+      ticketBtn.style.cursor = 'pointer'
+      ticketBtn.style.fontWeight = 'bold'
+      ticketBtn.onclick = () => {
+        mostrarTicket(compraId)
+        t.remove()
+      }
+      t.appendChild(ticketBtn)
+      
+      document.body.appendChild(t)
+      setTimeout(()=>{ t.style.transition = 'opacity 300ms'; t.style.opacity = '0' }, duration - 300)
+      setTimeout(()=>{ try { t.remove() } catch(e){} }, duration)
+    } catch(e){ console.debug('toast error', e) }
+  }
+
+  // Función para mostrar ticket
+  globalThis.mostrarTicket = async function(compraId) {
+    try {
+      // Determinar si es admin o usuario regular
+      const endpoint = window.location.pathname.includes('admin') 
+        ? `/admin/ticket/${compraId}` 
+        : `/carrito/ticket/${compraId}`
+      
+      const res = await fetch(endpoint)
+      if (!res.ok) {
+        const error = await res.json()
+        mostrarToast(error.mensaje || 'Error al obtener ticket')
+        return
+      }
+      
+      const ticket = await res.json()
+      
+      // Construir HTML del ticket
+      let productosHTML = ''
+      ticket.productos.forEach(prod => {
+        productosHTML += `
+          <tr class="border-b border-bread-200">
+            <td class="py-2">${prod.nombre}</td>
+            <td class="py-2 text-center">${prod.cantidad}</td>
+            <td class="py-2 text-right">$${parseFloat(prod.precio).toFixed(2)}</td>
+            <td class="py-2 text-right font-medium">$${parseFloat(prod.subtotal).toFixed(2)}</td>
+          </tr>
+        `
+      })
+      
+      const ticketHTML = `
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div class="sticky top-0 bg-bread-500 text-white p-6 rounded-t-lg">
+            <div class="flex justify-between items-center">
+              <h2 class="text-2xl font-light">Ticket de Compra</h2>
+              <button onclick="cerrarTicket()" class="text-white hover:text-bread-100 text-2xl">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="p-8">
+            <div class="text-center mb-6 pb-6 border-b-2 border-bread-200">
+              <h1 class="text-3xl font-bold text-bread-700 mb-2">La Desesperanza</h1>
+              <p class="text-sm text-bread-600">Panadería Artesanal</p>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
+              <div>
+                <p class="text-bread-600">Número de Venta:</p>
+                <p class="font-bold text-bread-700">${ticket.numeroVenta}</p>
+              </div>
+              <div>
+                <p class="text-bread-600">Fecha:</p>
+                <p class="font-bold text-bread-700">${new Date(ticket.fecha).toLocaleString('es-MX')}</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-bread-600">Cliente:</p>
+                <p class="font-bold text-bread-700">${ticket.username}</p>
+              </div>
+            </div>
+            
+            <div class="mb-6">
+              <h3 class="text-lg font-medium text-bread-700 mb-3">Productos Comprados</h3>
+              <table class="w-full text-sm">
+                <thead class="bg-bread-100 text-bread-700">
+                  <tr>
+                    <th class="py-2 px-2 text-left">Producto</th>
+                    <th class="py-2 px-2 text-center">Cant.</th>
+                    <th class="py-2 px-2 text-right">Precio</th>
+                    <th class="py-2 px-2 text-right">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody class="text-bread-700">
+                  ${productosHTML}
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="border-t-2 border-bread-500 pt-4">
+              <div class="flex justify-between items-center text-2xl font-bold text-bread-700">
+                <span>TOTAL:</span>
+                <span>$${parseFloat(ticket.total).toFixed(2)} MXN</span>
+              </div>
+            </div>
+            
+            <div class="mt-6 text-center text-sm text-bread-600">
+              <p>¡Gracias por su compra!</p>
+              <p class="mt-2">Conserve este ticket como comprobante</p>
+            </div>
+          </div>
+        </div>
+      `
+      
+      // Mostrar modal
+      const modal = document.getElementById('ticketModal')
+      if (modal) {
+        const container = modal.querySelector('#ticketContent')
+        if (container) {
+          container.innerHTML = ticketHTML
+          modal.classList.remove('hidden')
+          document.body.style.overflow = 'hidden'
+        }
+      }
+    } catch (error) {
+      console.error('Error al mostrar ticket:', error)
+      mostrarToast('Error al cargar el ticket')
+    }
+  }
+
+  globalThis.cerrarTicket = function() {
+    const modal = document.getElementById('ticketModal')
+    if (modal) {
+      modal.classList.add('hidden')
+      document.body.style.overflow = 'auto'
+    }
+  }
+
   // Helper functions for modals
   function abrirModalPorId(id) {
     const m = document.getElementById(id)
@@ -1010,14 +1175,8 @@
           cart = { items: [], total: 0 }
           persistCart(); updateCartTotal(); updateCartCount(); updateCartDisplay()
           
-          // Mostrar notificación con información del saldo
-          if (data.saldoDescontado && data.nuevoSaldo) {
-            try { 
-              globalThis.mostrarToast(`¡Compra exitosa! -$${parseFloat(data.saldoDescontado).toLocaleString('es-MX', { minimumFractionDigits: 2 })} • Nuevo saldo: $${parseFloat(data.nuevoSaldo).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 4000)
-            } catch(e){}
-          } else {
-            try { globalThis.mostrarToast(data.mensaje || 'Compra realizada correctamente') } catch(e){}
-          }
+          // Mostrar notificación con botón de ticket
+          try { globalThis.mostrarToastConTicket('Compra exitosa', data.compraId) } catch(e){}
           
           // Actualizar saldo en la UI
           try { await actualizarSaldoDisplay() } catch(e) { console.debug('Error actualizando saldo:', e) }

@@ -723,6 +723,64 @@ app.get('/admin/compras/:id', requireAdmin, async (req, res) => {
 	}
 })
 
+// ADMIN: obtener ticket de una compra
+app.get('/admin/ticket/:compraId', requireAdmin, async (req, res) => {
+	try {
+		const compraId = req.params.compraId
+
+		// Validar ID
+		if (!compraId || Number.isNaN(Number(compraId))) {
+			return res.status(400).json({ mensaje: 'ID de compra inválido' })
+		}
+
+		// Obtener información del ticket
+		const [ticketRows] = await pool.execute(`
+			SELECT 
+				t.id,
+				t.fecha_compra,
+				t.total_pagar,
+				t.numero_venta,
+				u.username
+			FROM ticket t
+			JOIN usuario u ON t.id_usuario = u.id
+			WHERE t.id_compra = ?
+		`, [compraId])
+
+		if (!ticketRows || ticketRows.length === 0) {
+			return res.status(404).json({ mensaje: 'Ticket no encontrado' })
+		}
+
+		const ticket = ticketRows[0]
+
+		// Obtener productos de la compra
+		const [productos] = await pool.execute(`
+			SELECT 
+				p.nombre,
+				p.precio,
+				dc.cantidad,
+				(p.precio * dc.cantidad) as subtotal
+			FROM detalle_compra dc
+			JOIN productos p ON dc.id_pan = p.id
+			WHERE dc.id_compra = ?
+		`, [compraId])
+
+		res.json({
+			negocio: 'La Desesperanza',
+			numeroVenta: ticket.numero_venta,
+			fecha: ticket.fecha_compra,
+			username: ticket.username,
+			productos: productos,
+			total: ticket.total_pagar
+		})
+	} catch (err) {
+		console.error('Error getting ticket:', err)
+		if (err.code && (err.code.startsWith('ER_') || err.code === 'ECONNREFUSED')) {
+			return res.status(500).json({ mensaje: 'Error de conexión con la base de datos' })
+		}
+		res.status(500).json({ mensaje: 'Error interno del servidor al obtener ticket' })
+	}
+})
+
 const port = process.env.PORT || 3000
 
 // Manejo de errores no capturados

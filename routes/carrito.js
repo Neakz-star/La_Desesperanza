@@ -136,6 +136,15 @@ module.exports = function(pool) {
           await conn.execute('UPDATE productos SET activo = 0 WHERE id = ? AND stock <= 0', [pid])
         }
         
+        // Generar número de venta único
+        const numeroVenta = `V-${compraId}-${Date.now().toString().slice(-6)}`
+        
+        // Crear ticket en la base de datos
+        await conn.execute(
+          'INSERT INTO ticket (id_usuario, id_compra, fecha_compra, total_pagar, numero_venta) VALUES (?, ?, NOW(), ?, ?)',
+          [userId, compraId, total, numeroVenta]
+        )
+        
         await conn.commit()
         conn.release()
         
@@ -145,7 +154,8 @@ module.exports = function(pool) {
           total: total,
           saldoAnterior: saldoActual.toFixed(2),
           nuevoSaldo: nuevoSaldo.toFixed(2),
-          saldoDescontado: total.toFixed(2)
+          saldoDescontado: total.toFixed(2),
+          numeroVenta: numeroVenta
         })
       } catch (err) {
         await conn.rollback().catch(()=>{})
@@ -220,6 +230,59 @@ module.exports = function(pool) {
     } catch (err) {
       console.error('Error obteniendo detalles de compra:', err)
       res.status(500).json({ mensaje: 'Error al obtener detalles' })
+    }
+  })
+
+  // Obtener ticket de una compra
+  router.get('/ticket/:compraId', async (req, res) => {
+    try {
+      if (!req.session?.userId) return res.status(401).json({ mensaje: 'Debes iniciar sesión' })
+
+      const userId = req.session.userId
+      const compraId = req.params.compraId
+
+      // Obtener información del ticket
+      const [ticketRows] = await pool.execute(`
+        SELECT 
+          t.id,
+          t.fecha_compra,
+          t.total_pagar,
+          t.numero_venta,
+          u.username
+        FROM ticket t
+        JOIN usuario u ON t.id_usuario = u.id
+        WHERE t.id_compra = ? AND t.id_usuario = ?
+      `, [compraId, userId])
+
+      if (!ticketRows || ticketRows.length === 0) {
+        return res.status(404).json({ mensaje: 'Ticket no encontrado' })
+      }
+
+      const ticket = ticketRows[0]
+
+      // Obtener productos de la compra
+      const [productos] = await pool.execute(`
+        SELECT 
+          p.nombre,
+          p.precio,
+          dc.cantidad,
+          (p.precio * dc.cantidad) as subtotal
+        FROM detalle_compra dc
+        JOIN productos p ON dc.id_pan = p.id
+        WHERE dc.id_compra = ?
+      `, [compraId])
+
+      res.json({
+        negocio: 'La Desesperanza',
+        numeroVenta: ticket.numero_venta,
+        fecha: ticket.fecha_compra,
+        username: ticket.username,
+        productos: productos,
+        total: ticket.total_pagar
+      })
+    } catch (err) {
+      console.error('Error obteniendo ticket:', err)
+      res.status(500).json({ mensaje: 'Error al obtener ticket' })
     }
   })
 
