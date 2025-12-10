@@ -273,7 +273,7 @@
               <p class="text-xs text-gray-500">Stock: ${product.stock}</p>
             </div>
           </div>
-          <button onclick="addToAdminCart(${product.id}, '${escapeHtml(product.nombre)}', ${product.precio})" 
+          <button onclick="addToAdminCart(${product.id}, '${escapeHtml(product.nombre)}', ${product.precio}, ${product.stock})" 
                   class="bg-bread-500 text-white px-3 py-1 rounded hover:bg-bread-600 transition-colors">
             <i class="fas fa-plus"></i>
           </button>
@@ -287,8 +287,15 @@
   }
 
   // Función para agregar productos al carrito del admin
-  globalThis.addToAdminCart = function(id, nombre, precio) {
+  globalThis.addToAdminCart = async function(id, nombre, precio, stock) {
     const existingItem = adminCart.items.find(item => item.id === id)
+    const currentQuantity = existingItem ? existingItem.quantity : 0
+    
+    // Validar stock disponible
+    if (currentQuantity >= stock) {
+      mostrarToast(`No hay más stock disponible de ${nombre}. Stock actual: ${stock}`)
+      return
+    }
     
     if (existingItem) {
       existingItem.quantity += 1
@@ -441,7 +448,12 @@
       
       // Actualizar historial de compras automáticamente
       if (typeof loadUserPurchases === 'function') {
-        loadUserPurchases()
+        setTimeout(() => loadUserPurchases(), 500)
+      }
+      
+      // Recargar todas las compras si estamos en vista de admin
+      if (typeof loadAllPurchases === 'function') {
+        setTimeout(() => loadAllPurchases(), 500)
       }
       
     } catch (error) {
@@ -1078,7 +1090,7 @@
       }
     }
 
-    globalThis.addToCart = function(a, b, c, d) {
+    globalThis.addToCart = async function(a, b, c, d, stock) {
       let id = null, name, price, image
       if (typeof a === 'number' || (typeof a === 'string' && /^\d+$/.test(a))) {
         id = Number(a)
@@ -1090,7 +1102,16 @@
         price = b
         image = c
       }
+      
       const existingItem = cart.items.find(i => i.name === name)
+      const currentQuantity = existingItem ? existingItem.quantity : 0
+      
+      // Validar stock si está disponible
+      if (stock !== undefined && currentQuantity >= stock) {
+        try { globalThis.mostrarToast(`No hay más stock disponible de ${name}. Stock actual: ${stock}`) } catch(e) {}
+        return
+      }
+      
       if (existingItem) existingItem.quantity += 1
       else cart.items.push({ id: id || null, name, price, image, quantity: 1 })
       try { globalThis.mostrarToast('Producto agregado al carrito') } catch(e) { console.debug('toast error', e) }
@@ -1183,7 +1204,7 @@
           
           // Actualizar historial de compras automáticamente
           if (typeof loadUserPurchasesPublic === 'function') {
-            setTimeout(() => loadUserPurchasesPublic(), 500) // Pequeño delay para asegurar que la BD se actualice
+            setTimeout(() => loadUserPurchasesPublic(), 800) // Delay para asegurar que la BD se actualice
           }
           
         } catch (err) {
@@ -1591,7 +1612,7 @@
                     ${stockBadge ? `<p class="mt-1">${stockBadge}</p>` : ''}
                     <div class="flex justify-between items-center mt-6">
                       <p class="text-bread-700 font-medium">$${Number(p.precio).toFixed(2)} MXN</p>
-                      <button onclick="addToCart(${p.id}, '${escapeHtml(p.nombre)}', ${Number(p.precio)}, '${escapeHtml(img)}')" class="bg-bread-500 text-white p-2 rounded-full hover:bg-bread-600 transform hover:scale-110 transition-all duration-300"><i class="fas fa-plus"></i></button>
+                      <button onclick="addToCart(${p.id}, '${escapeHtml(p.nombre)}', ${Number(p.precio)}, '${escapeHtml(img)}', ${p.stock})" class="bg-bread-500 text-white p-2 rounded-full hover:bg-bread-600 transform hover:scale-110 transition-all duration-300"><i class="fas fa-plus"></i></button>
                     </div>
                   </div>
                 `
