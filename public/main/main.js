@@ -1695,7 +1695,6 @@
             return
           }
           
-          mostrarToast(`✅ Saldo actualizado: $${Number(data.nuevoSaldo).toFixed(2)}`)
           closeEditSaldoModal()
           await loadAdminUsers()
         } catch (err) {
