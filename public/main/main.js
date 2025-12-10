@@ -102,6 +102,117 @@
     }
   }
 
+  globalThis.toggleSaldo = async function() {
+    // Verificar si el usuario está logueado
+    try {
+      const checkRes = await fetch('/check-auth')
+      const authData = await checkRes.json()
+      
+      if (!authData.loggedIn) {
+        alert('Debes iniciar sesión para acceder a tu billetera')
+        showLoginModal()
+        return
+      }
+    } catch (error) {
+      console.error('Error al verificar autenticación:', error)
+      alert('Debes iniciar sesión para acceder a tu billetera')
+      showLoginModal()
+      return
+    }
+
+    const saldoSidebar = document.getElementById('saldoSidebar')
+    if (saldoSidebar) {
+      if (saldoSidebar.classList.contains('translate-x-full')) {
+        // Mostrar sidebar de saldo
+        saldoSidebar.classList.remove('translate-x-full')
+        saldoSidebar.classList.add('translate-x-0')
+        document.body.style.overflow = 'hidden'
+        
+        // Cargar saldo actual
+        await actualizarSaldoDisplay()
+      } else {
+        // Ocultar sidebar de saldo
+        saldoSidebar.classList.add('translate-x-full')
+        saldoSidebar.classList.remove('translate-x-0')
+        document.body.style.overflow = 'auto'
+      }
+    }
+  }
+
+  globalThis.setMontoRecarga = function(monto) {
+    const input = document.getElementById('montoRecarga')
+    const display = document.getElementById('montoAgregar')
+    if (input && display) {
+      input.value = monto
+      display.textContent = `$${monto.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    }
+  }
+
+  globalThis.actualizarSaldoDisplay = async function() {
+    try {
+      const res = await fetch('/saldo')
+      const data = await res.json()
+      
+      if (data.saldo !== undefined) {
+        const saldoActual = document.getElementById('saldoActual')
+        const saldoCounter = document.getElementById('saldoCounter')
+        
+        if (saldoActual) {
+          saldoActual.textContent = `$${parseFloat(data.saldo).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+        }
+        if (saldoCounter) {
+          saldoCounter.textContent = `$${parseFloat(data.saldo).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+        }
+      }
+    } catch (error) {
+      console.error('Error al obtener saldo:', error)
+    }
+  }
+
+  globalThis.agregarSaldo = async function() {
+    const input = document.getElementById('montoRecarga')
+    const monto = parseFloat(input.value)
+    
+    if (!monto || monto <= 0) {
+      alert('Por favor ingresa un monto válido mayor a 0')
+      return
+    }
+    
+    if (monto > 999999999999) {
+      alert('El monto excede el límite máximo de $999,999,999,999')
+      return
+    }
+    
+    try {
+      const res = await fetch('/saldo/agregar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ monto })
+      })
+      
+      const data = await res.json()
+      
+      if (data.success) {
+        alert(`¡Saldo agregado exitosamente!\n\nSaldo anterior: $${parseFloat(data.saldoAnterior).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\nMonto agregado: $${parseFloat(data.montoAgregado).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\nNuevo saldo: $${parseFloat(data.nuevoSaldo).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)
+        
+        // Actualizar displays
+        await actualizarSaldoDisplay()
+        
+        // Limpiar input
+        input.value = ''
+        const display = document.getElementById('montoAgregar')
+        if (display) {
+          display.textContent = '$0.00'
+        }
+      } else {
+        alert('Error: ' + data.message)
+      }
+    } catch (error) {
+      console.error('Error al agregar saldo:', error)
+      alert('Error al agregar saldo. Por favor intenta de nuevo.')
+    }
+  }
+
   // Función legacy para compatibilidad
   globalThis.showCart = function() {
     toggleCart()
@@ -554,6 +665,25 @@
         }
       }
     })
+
+    // Event listener para actualizar el monto de recarga
+    const montoRecargaInput = document.getElementById('montoRecarga')
+    if (montoRecargaInput) {
+      montoRecargaInput.addEventListener('input', function() {
+        const display = document.getElementById('montoAgregar')
+        const monto = parseFloat(this.value)
+        if (display) {
+          if (monto && monto > 0) {
+            display.textContent = `$${monto.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+          } else {
+            display.textContent = '$0.00'
+          }
+        }
+      })
+    }
+
+    // Actualizar saldo al cargar la página si el usuario está logueado
+    actualizarSaldoDisplay()
   })
 
   // Funciones específicas para la página pública (index.html)
@@ -1023,6 +1153,7 @@
           const data = await res.json()
           closeModals()
           try { updateUserUI(data) } catch(e){ console.debug('updateUI error', e) }
+          try { actualizarSaldoDisplay() } catch(e){ console.debug('saldo update error', e) }
           try { globalThis.mostrarToast('Has iniciado sesión correctamente') } catch(e){}
           if (data.admin) {
             try { localStorage.setItem('sessionNotice', 'Has iniciado sesión correctamente') } catch(e){}

@@ -200,6 +200,80 @@ app.post('/register', async (req, res) => {
 	}
 })
 
+// Rutas para manejo de saldo
+// Obtener saldo del usuario
+app.get('/saldo', (req, res) => {
+	if (!req.session.userId) {
+		return res.status(401).json({ mensaje: 'Debes iniciar sesión' })
+	}
+
+	pool.execute('SELECT sueldo FROM usuario WHERE id = ?', [req.session.userId])
+		.then(([rows]) => {
+			if (rows.length === 0) {
+				return res.status(404).json({ mensaje: 'Usuario no encontrado' })
+			}
+			const saldo = Number(rows[0].sueldo) || 0
+			res.json({ saldo: saldo.toFixed(2) })
+		})
+		.catch(err => {
+			console.error('Error al obtener saldo:', err)
+			res.status(500).json({ mensaje: 'Error al obtener saldo' })
+		})
+})
+
+// Agregar saldo
+app.post('/saldo/agregar', async (req, res) => {
+	if (!req.session.userId) {
+		return res.status(401).json({ mensaje: 'Debes iniciar sesión' })
+	}
+
+	try {
+		const { monto } = req.body
+
+		// Validar que el monto sea un número positivo
+		const montoNum = Number(monto)
+		if (isNaN(montoNum) || montoNum <= 0) {
+			return res.status(400).json({ mensaje: 'El monto debe ser un número positivo' })
+		}
+
+		// Validar que sea un número real (no imaginario ni infinito)
+		if (!Number.isFinite(montoNum)) {
+			return res.status(400).json({ mensaje: 'El monto debe ser un número válido' })
+		}
+
+		// Obtener saldo actual
+		const [rows] = await pool.execute('SELECT sueldo FROM usuario WHERE id = ?', [req.session.userId])
+		
+		if (rows.length === 0) {
+			return res.status(404).json({ mensaje: 'Usuario no encontrado' })
+		}
+
+		const saldoActual = Number(rows[0].sueldo) || 0
+		const nuevoSaldo = saldoActual + montoNum
+
+		// Validar límite máximo
+		if (nuevoSaldo > 999999999999) {
+			return res.status(400).json({ mensaje: 'El saldo no puede superar $999,999,999,999' })
+		}
+
+		// Actualizar saldo
+		await pool.execute('UPDATE usuario SET sueldo = ? WHERE id = ?', [nuevoSaldo, req.session.userId])
+
+		res.json({ 
+			mensaje: 'Saldo agregado correctamente', 
+			saldoAnterior: saldoActual.toFixed(2),
+			montoAgregado: montoNum.toFixed(2),
+			nuevoSaldo: nuevoSaldo.toFixed(2)
+		})
+	} catch (err) {
+		console.error('Error al agregar saldo:', err)
+		if (err.code && (err.code.startsWith('ER_') || err.code === 'ECONNREFUSED')) {
+			return res.status(500).json({ mensaje: 'Error de conexión con la base de datos' })
+		}
+		res.status(500).json({ mensaje: 'Error al agregar saldo' })
+	}
+})
+
 app.post('/logout', (req, res) => {
 	req.session.destroy(err => {
 		if (err) return res.status(500).json({ mensaje: 'Error al cerrar sesión' })

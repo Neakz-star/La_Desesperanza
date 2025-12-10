@@ -36,6 +36,10 @@
             </div>
             <div class="flex items-center space-x-8">
                 <a href="#adminManagement" class="text-bread-600 hover:text-bread-700 text-sm uppercase tracking-wider">Gestión</a>
+                <button onclick="toggleSaldo()" class="bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition-colors duration-300 relative">
+                    <i class="fas fa-wallet"></i>
+                    <span id="saldoCounter" class="absolute -top-2 -right-2 bg-green-900 text-white text-xs px-2 py-0.5 rounded-full flex items-center justify-center whitespace-nowrap">$0</span>
+                </button>
                 <button onclick="toggleCart()" class="bg-bread-500 text-white p-2 rounded-full hover:bg-bread-600 transition-colors duration-300 relative">
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cartCounter" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">0</span>
@@ -389,6 +393,68 @@
                 <button onclick="checkout()" 
                     class="w-full bg-bread-500 text-white py-3 px-4 rounded-lg hover:bg-bread-600 transition-colors duration-300">
                     Realizar Pedido
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="saldoSidebar" class="fixed inset-y-0 right-0 w-96 bg-white shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out z-50">
+        <div class="flex flex-col h-full">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-light text-bread-700">Tu Saldo</h2>
+                    <button onclick="toggleSaldo()" class="text-bread-500 hover:text-bread-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                <div class="bg-bread-100 p-6 rounded-lg text-center">
+                    <p class="text-sm text-bread-600 mb-2">Saldo Actual</p>
+                    <p class="text-4xl font-bold text-bread-700" id="saldoActual">$0.00</p>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-lg font-medium text-bread-700">Agregar Saldo</h3>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setMontoRecarga(50)" class="bg-bread-100 hover:bg-bread-200 text-bread-700 py-3 rounded-lg transition-colors">
+                            $50
+                        </button>
+                        <button onclick="setMontoRecarga(100)" class="bg-bread-100 hover:bg-bread-200 text-bread-700 py-3 rounded-lg transition-colors">
+                            $100
+                        </button>
+                        <button onclick="setMontoRecarga(200)" class="bg-bread-100 hover:bg-bread-200 text-bread-700 py-3 rounded-lg transition-colors">
+                            $200
+                        </button>
+                        <button onclick="setMontoRecarga(500)" class="bg-bread-100 hover:bg-bread-200 text-bread-700 py-3 rounded-lg transition-colors">
+                            $500
+                        </button>
+                        <button onclick="setMontoRecarga(1000)" class="bg-bread-100 hover:bg-bread-200 text-bread-700 py-3 rounded-lg transition-colors">
+                            $1,000
+                        </button>
+                        <button onclick="setMontoRecarga(5000)" class="bg-bread-100 hover:bg-bread-200 text-bread-700 py-3 rounded-lg transition-colors">
+                            $5,000
+                        </button>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="montoRecarga" class="text-sm text-bread-600">O ingresa un monto personalizado:</label>
+                        <input type="number" id="montoRecarga" min="0.01" max="999999999999" step="0.01" 
+                            class="w-full px-4 py-3 border border-bread-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-bread-500"
+                            placeholder="Ingresa el monto">
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-200 p-6 space-y-4">
+                <div class="flex justify-between items-center text-lg">
+                    <span class="font-medium text-bread-700">Monto a Agregar</span>
+                    <span class="font-medium text-bread-700" id="montoAgregar">$0.00</span>
+                </div>
+                <button onclick="agregarSaldo()" 
+                    class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors duration-300">
+                    <i class="fas fa-plus-circle mr-2"></i>Agregar Saldo
                 </button>
             </div>
         </div>
