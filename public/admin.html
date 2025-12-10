@@ -15,15 +15,18 @@
                         'bread': {
                             100: '#FFF5F5',
                             200: '#FFE5E5',
-                            500: '#C41E3A',
-                            600: '#165B33',
-                            700: '#0F4A29'
+                            500: '#DC143C',
+                            600: '#0F6B3C',
+                            700: '#0A5230'
                         },
                         'christmas': {
-                            red: '#C41E3A',
-                            green: '#165B33',
+                            red: '#DC143C',
+                            darkred: '#B8102E',
+                            green: '#0F6B3C',
+                            darkgreen: '#0A5230',
                             gold: '#FFD700',
-                            snow: '#FFFFFF'
+                            snow: '#FFFFFF',
+                            lightred: '#FFD5D5'
                         }
                     }
                 }
@@ -46,7 +49,7 @@
             pointer-events: none;
         }
         body {
-            background: linear-gradient(135deg, #FFF5F5 0%, #FFE5E5 100%);
+            background: linear-gradient(135deg, #FFFFFF 0%, #FFF5F5 100%);
         }
     </style>
 </head>
@@ -130,13 +133,13 @@
 
     
     
-    <div id="adminManagement" class="bg-white rounded-lg shadow-sm p-6">
+    <div id="adminManagement" class="rounded-lg shadow-xl p-6 border-4 border-christmas-red" style="background: linear-gradient(135deg, #FFFFFF 0%, #FFE8E8 100%);">
             <!-- Sección de Gestión de Productos -->
-            <div id="productosSection" class="mb-8">
+            <div id="productosSection" class="mb-8 bg-white rounded-lg p-6 shadow-lg border-2 border-christmas-green">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-light text-bread-700">Gestión de Productos</h2>
+                    <h2 class="text-xl font-light text-bread-700"><i class="fas fa-box text-christmas-red mr-2"></i>Gestión de Productos</h2>
                     <button onclick="showAddProductModal()" 
-                        class="bg-bread-500 text-white px-4 py-2 rounded-lg hover:bg-bread-600 transition-colors duration-300">
+                        class="bg-christmas-red text-white px-4 py-2 rounded-lg hover:bg-christmas-darkred transition-colors duration-300 shadow-md">
                         <i class="fas fa-plus mr-2"></i>Añadir Producto
                     </button>
                 </div>
@@ -159,16 +162,16 @@
             </div>
 
             <!-- Sección de Compras -->
-            <div id="comprasSection" class="mt-8 mb-8">
+            <div id="comprasSection" class="mt-8 mb-8 bg-white rounded-lg p-6 shadow-lg border-2 border-christmas-red">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-light text-bread-700">Gestión de Compras</h2>
+                    <h2 class="text-xl font-light text-bread-700"><i class="fas fa-shopping-cart text-christmas-red mr-2"></i>Gestión de Compras</h2>
                 </div>
                 
                 <!-- Subsección: Mis Compras -->
                 <div class="mb-6">
                     <div class="mb-4 flex justify-between items-center">
                         <h3 class="text-lg font-medium text-bread-600">Mis Compras</h3>
-                        <button onclick="loadUserPurchases()" class="bg-bread-500 text-white px-4 py-2 rounded hover:bg-bread-600 transition-colors">
+                        <button onclick="loadUserPurchases()" class="bg-christmas-red text-white px-4 py-2 rounded hover:bg-christmas-darkred transition-colors shadow-md">
                             <i class="fas fa-sync-alt mr-2"></i>Actualizar
                         </button>
                     </div>
@@ -193,7 +196,7 @@
                 <div>
                     <div class="mb-4 flex justify-between items-center">
                         <h3 class="text-lg font-medium text-bread-600">Compras Usuarios</h3>
-                        <button onclick="loadAllPurchases()" class="bg-bread-500 text-white px-4 py-2 rounded hover:bg-bread-600 transition-colors">
+                        <button onclick="loadAllPurchases()" class="bg-christmas-green text-white px-4 py-2 rounded hover:bg-christmas-darkgreen transition-colors shadow-md">
                             <i class="fas fa-sync-alt mr-2"></i>Actualizar
                         </button>
                     </div>
@@ -218,9 +221,9 @@
             </div>
 
             <!-- Sección de Gestión de Usuarios -->
-            <div id="adminUsersSection" class="mt-8">
+            <div id="adminUsersSection" class="mt-8 bg-white rounded-lg p-6 shadow-lg border-2 border-christmas-green">
                 <div class="mb-4">
-                    <h2 class="text-xl font-light text-bread-700">Gestión de Usuarios</h2>
+                    <h2 class="text-xl font-light text-bread-700"><i class="fas fa-users text-christmas-green mr-2"></i>Gestión de Usuarios</h2>
                 </div>
                 <div class="overflow-x-auto bg-white rounded-lg p-4 shadow-sm">
                     <table class="min-w-full" id="adminUsersTable">
