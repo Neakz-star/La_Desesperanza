@@ -166,6 +166,19 @@ app.post('/login', async (req, res) => {
 	}
 })
 
+// Verificar si el usuario está autenticado
+app.get('/check-auth', (req, res) => {
+	if (req.session && req.session.userId) {
+		res.json({ 
+			loggedIn: true, 
+			username: req.session.username, 
+			admin: req.session.admin 
+		})
+	} else {
+		res.json({ loggedIn: false })
+	}
+})
+
 // Registro de usuarios
 app.post('/register', async (req, res) => {
 	try {

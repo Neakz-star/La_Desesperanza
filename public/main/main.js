@@ -109,13 +109,13 @@
       const authData = await checkRes.json()
       
       if (!authData.loggedIn) {
-        alert('Debes iniciar sesión para acceder a tu billetera')
+        mostrarToast('Debes iniciar sesión para acceder a tu billetera')
         showLoginModal()
         return
       }
     } catch (error) {
       console.error('Error al verificar autenticación:', error)
-      alert('Debes iniciar sesión para acceder a tu billetera')
+      mostrarToast('Debes iniciar sesión para acceder a tu billetera')
       showLoginModal()
       return
     }
@@ -174,12 +174,12 @@
     const monto = parseFloat(input.value)
     
     if (!monto || monto <= 0) {
-      alert('Por favor ingresa un monto válido mayor a 0')
+      mostrarToast('Por favor ingresa un monto válido mayor a 0')
       return
     }
     
     if (monto > 999999999999) {
-      alert('El monto excede el límite máximo de $999,999,999,999')
+      mostrarToast('El monto excede el límite máximo')
       return
     }
     
@@ -193,7 +193,7 @@
       const data = await res.json()
       
       if (data.success) {
-        alert(`¡Saldo agregado exitosamente!\n\nSaldo anterior: $${parseFloat(data.saldoAnterior).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\nMonto agregado: $${parseFloat(data.montoAgregado).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\nNuevo saldo: $${parseFloat(data.nuevoSaldo).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)
+        mostrarToast(`¡Saldo agregado! +$${parseFloat(data.montoAgregado).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} • Nuevo saldo: $${parseFloat(data.nuevoSaldo).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 4000)
         
         // Actualizar displays
         await actualizarSaldoDisplay()
@@ -205,11 +205,11 @@
           display.textContent = '$0.00'
         }
       } else {
-        alert('Error: ' + data.message)
+        mostrarToast('Error: ' + data.message)
       }
     } catch (error) {
       console.error('Error al agregar saldo:', error)
-      alert('Error al agregar saldo. Por favor intenta de nuevo.')
+      mostrarToast('Error al agregar saldo. Por favor intenta de nuevo.')
     }
   }
 
