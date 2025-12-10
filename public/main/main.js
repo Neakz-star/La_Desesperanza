@@ -1688,17 +1688,13 @@
             body: JSON.stringify({ nuevoSaldo })
           })
           
+          const data = await res.json()
+          
           if (!res.ok) {
-            try {
-              const error = await res.json()
-              mostrarToast(error.mensaje || 'Error al actualizar saldo')
-            } catch {
-              mostrarToast('Error al actualizar saldo')
-            }
+            mostrarToast(data.mensaje || 'Error al actualizar saldo')
             return
           }
           
-          const data = await res.json()
           mostrarToast(`✅ Saldo actualizado: $${Number(data.nuevoSaldo).toFixed(2)}`)
           closeEditSaldoModal()
           await loadAdminUsers()
