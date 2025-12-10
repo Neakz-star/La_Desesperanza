@@ -13,11 +13,17 @@
                 extend: {
                     colors: {
                         'bread': {
-                            100: '#F0EBE3',
-                            200: '#DCC5A0',
-                            500: '#B8860B',
-                            600: '#8B4513',
-                            700: '#654321'
+                            100: '#FFF5F5',
+                            200: '#FFE5E5',
+                            500: '#C41E3A',
+                            600: '#165B33',
+                            700: '#0F4A29'
+                        },
+                        'christmas': {
+                            red: '#C41E3A',
+                            green: '#165B33',
+                            gold: '#FFD700',
+                            snow: '#FFFFFF'
                         }
                     }
                 }
@@ -26,26 +32,44 @@
     </script>
     <style>
         html { scroll-behavior: smooth; }
+        @keyframes snowfall {
+            0% { transform: translateY(-100px); }
+            100% { transform: translateY(100vh); }
+        }
+        .snowflake {
+            position: fixed;
+            top: -10px;
+            z-index: 9999;
+            color: #fff;
+            font-size: 1em;
+            animation: snowfall linear infinite;
+            pointer-events: none;
+        }
+        body {
+            background: linear-gradient(135deg, #FFF5F5 0%, #FFE5E5 100%);
+        }
     </style>
 </head>
 <body class="bg-bread-100">
     <nav class="bg-white shadow-sm py-6 sticky top-0 z-40">
         <div class="container mx-auto flex justify-between items-center px-6">
             <div class="flex items-center space-x-2">
+                <i class="fas fa-snowflake text-christmas-gold"></i>
                 <h1 class="text-2xl font-light tracking-wide text-bread-700">LA DESESPERANZA</h1>
+                <i class="fas fa-candy-cane text-christmas-red"></i>
             </div>
             <div class="flex items-center space-x-8">
-                <a href="#adminManagement" class="text-bread-600 hover:text-bread-700 text-sm uppercase tracking-wider">Gestión</a>
-                <button onclick="toggleSaldo()" class="bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition-colors duration-300 relative">
+                <a href="#adminManagement" class="text-bread-600 hover:text-christmas-red text-sm uppercase tracking-wider">Gestión</a>
+                <button onclick="toggleSaldo()" class="bg-christmas-green text-white p-2 rounded-full hover:bg-bread-700 transition-colors duration-300 relative shadow-lg">
                     <i class="fas fa-wallet"></i>
-                    <span id="saldoCounter" class="absolute -top-2 -right-2 bg-green-900 text-white text-xs px-2 py-0.5 rounded-full flex items-center justify-center whitespace-nowrap">$0</span>
+                    <span id="saldoCounter" class="absolute -top-2 -right-2 bg-christmas-gold text-bread-700 text-xs px-2 py-0.5 rounded-full flex items-center justify-center whitespace-nowrap font-bold">$0</span>
                 </button>
-                <button onclick="toggleCart()" class="bg-bread-500 text-white p-2 rounded-full hover:bg-bread-600 transition-colors duration-300 relative">
+                <button onclick="toggleCart()" class="bg-christmas-red text-white p-2 rounded-full hover:bg-bread-500 transition-colors duration-300 relative shadow-lg">
                     <i class="fas fa-shopping-cart"></i>
-                    <span id="cartCounter" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                    <span id="cartCounter" class="absolute -top-2 -right-2 bg-christmas-gold text-bread-700 text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
                 </button>
                 <button id="loginBtn" onclick="showLoginModal()" 
-                    class="bg-transparent border-2 border-bread-500 text-bread-700 px-4 py-2 rounded-lg hover:bg-bread-500 hover:text-white transition-colors duration-300">
+                    class="bg-transparent border-2 border-christmas-red text-bread-700 px-4 py-2 rounded-lg hover:bg-christmas-red hover:text-white transition-colors duration-300">
                     <i class="fas fa-user mr-2"></i>Iniciar Sesión
                 </button>
             </div>
@@ -542,9 +566,9 @@
         </div>
     </div>
 
-    <footer class="bg-bread-700 text-white py-8">
+    <footer class="bg-christmas-green text-white py-8 shadow-lg">
         <div class="container mx-auto px-6 text-center">
-            <p>&copy; 2025 LA DESESPERANZA. Todos los derechos reservados.</p>
+            <p><i class="fas fa-snowflake text-christmas-gold mr-2"></i>&copy; 2025 LA DESESPERANZA - ¡Feliz Navidad!<i class="fas fa-snowflake text-christmas-gold ml-2"></i></p>
         </div>
     </footer>
 
@@ -554,5 +578,23 @@
     <script src="scripts/mapa/map.js"></script>
     <script src="/validacion.js"></script>
     <script src="/main/main.js"></script>
+    
+    <!-- Script de nieve navideña -->
+    <script>
+        function createSnowflakes() {
+            const snowflakeChars = ['❄️', '❅', '❆', '❃'];
+            for (let i = 0; i < 50; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.textContent = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+                snowflake.style.left = Math.random() * 100 + '%';
+                snowflake.style.animationDuration = (Math.random() * 3 + 5) + 's';
+                snowflake.style.animationDelay = Math.random() * 5 + 's';
+                snowflake.style.opacity = Math.random() * 0.7 + 0.3;
+                document.body.appendChild(snowflake);
+            }
+        }
+        window.addEventListener('load', createSnowflakes);
+    </script>
 </body>
 </html>
