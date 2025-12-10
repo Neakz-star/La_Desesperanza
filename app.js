@@ -424,7 +424,7 @@ app.get('/admin', requireAdmin, (req, res) => {
 // ADMIN: listar usuarios
 app.get('/admin/users', requireAdmin, async (req, res) => {
 	try {
-		const [rows] = await pool.execute('SELECT id, username, admin FROM usuario ORDER BY id ASC')
+		const [rows] = await pool.execute('SELECT id, username, admin, sueldo FROM usuario ORDER BY id ASC')
 		res.json(rows)
 	} catch (err) {
 		console.error('Error getting users:', err)
@@ -448,6 +448,57 @@ app.post('/admin/users/:id/toggle-admin', requireAdmin, async (req, res) => {
 			return res.status(500).json({ mensaje: 'Error de conexión con la base de datos' })
 		}
 		res.status(500).json({ mensaje: 'Error interno del servidor al actualizar usuario' })
+	}
+})
+
+// ADMIN: actualizar saldo de un usuario
+app.post('/admin/users/:id/update-saldo', requireAdmin, async (req, res) => {
+	try {
+		const userId = req.params.id
+		const { nuevoSaldo } = req.body
+		
+		// Validaciones
+		if (!userId || Number.isNaN(Number(userId))) {
+			return res.status(400).json({ mensaje: 'ID de usuario inválido' })
+		}
+		
+		const saldoNum = Number(nuevoSaldo)
+		if (Number.isNaN(saldoNum) || saldoNum < 0) {
+			return res.status(400).json({ mensaje: 'El saldo debe ser un número positivo' })
+		}
+		
+		if (!Number.isFinite(saldoNum)) {
+			return res.status(400).json({ mensaje: 'El saldo debe ser un número válido' })
+		}
+		
+		if (saldoNum > 999999999999) {
+			return res.status(400).json({ mensaje: 'El saldo no puede superar $999,999,999,999' })
+		}
+		
+		// Verificar que el usuario existe
+		const [rows] = await pool.execute('SELECT id FROM usuario WHERE id = ?', [userId])
+		if (rows.length === 0) {
+			return res.status(404).json({ mensaje: 'Usuario no encontrado' })
+		}
+		
+		// Actualizar saldo
+		await pool.execute('UPDATE usuario SET sueldo = ? WHERE id = ?', [saldoNum, userId])
+		
+		console.log('✅ Admin actualizó saldo:', {
+			userId: userId,
+			nuevoSaldo: saldoNum.toFixed(2)
+		})
+		
+		res.json({ 
+			mensaje: 'Saldo actualizado correctamente',
+			nuevoSaldo: saldoNum.toFixed(2)
+		})
+	} catch (err) {
+		console.error('Error updating user saldo:', err)
+		if (err.code && (err.code.startsWith('ER_') || err.code === 'ECONNREFUSED')) {
+			return res.status(500).json({ mensaje: 'Error de conexión con la base de datos' })
+		}
+		res.status(500).json({ mensaje: 'Error interno del servidor al actualizar saldo' })
 	}
 })
 

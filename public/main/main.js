@@ -293,7 +293,7 @@
     
     // Validar stock disponible
     if (currentQuantity >= stock) {
-      mostrarToast(`No hay más stock disponible de ${nombre}. Stock actual: ${stock}`)
+      mostrarToast(`No hay más stock de ${nombre}`)
       return
     }
     
@@ -509,6 +509,12 @@
       console.error('Error loading user purchases:', error)
       tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-red-500">Error al cargar compras</td></tr>'
     }
+    
+    // Recargar automáticamente cada 10 segundos
+    setTimeout(() => {
+      const tbodyCheck = document.getElementById('userPurchasesTbody')
+      if (tbodyCheck) loadUserPurchases()
+    }, 10000)
   }
 
   // Función para cargar todas las compras (admin)
@@ -560,6 +566,12 @@
       console.error('Error loading all purchases:', error)
       tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-red-500">Error al cargar compras</td></tr>'
     }
+    
+    // Recargar automáticamente cada 10 segundos
+    setTimeout(() => {
+      const tbodyCheck = document.getElementById('allPurchasesTbody')
+      if (tbodyCheck) loadAllPurchases()
+    }, 10000)
   }
 
   // Función para mostrar detalles de compra (usuario)
@@ -754,6 +766,12 @@
         `
         tbody.appendChild(tr)
       })
+      
+      // Recargar automáticamente cada 10 segundos si estamos en la sección de compras
+      const section = document.getElementById('mis-compras')
+      if (section && !section.classList.contains('hidden')) {
+        setTimeout(() => loadUserPurchasesPublic(), 10000)
+      }
     } catch (error) {
       console.error('Error loading user purchases:', error)
       tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-red-500">Error al cargar compras</td></tr>'
@@ -1108,7 +1126,7 @@
       
       // Validar stock si está disponible
       if (stock !== undefined && currentQuantity >= stock) {
-        try { globalThis.mostrarToast(`No hay más stock disponible de ${name}. Stock actual: ${stock}`) } catch(e) {}
+        try { globalThis.mostrarToast(`No hay más stock de ${name}`) } catch(e) {}
         return
       }
       
@@ -1485,16 +1503,16 @@
       async function loadAdminUsers() {
         const tbody = document.getElementById('adminUsersTbody')
         if (!tbody) return
-        tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-bread-600">Cargando usuarios...</td></tr>'
+        tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-bread-600">Cargando usuarios...</td></tr>'
         try {
           const res = await fetch('/admin/users')
           if (!res.ok) {
-            tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-red-500">No autorizado o error</td></tr>'
+            tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-red-500">No autorizado o error</td></tr>'
             return
           }
           const users = await res.json()
           if (!Array.isArray(users) || users.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-bread-600">No hay usuarios</td></tr>'
+            tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-bread-600">No hay usuarios</td></tr>'
             return
           }
           tbody.innerHTML = ''
@@ -1504,12 +1522,15 @@
             const adminBadge = u.admin
               ? '<span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">Activo</span>'
               : '<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">Usuario</span>'
+            const saldo = Number(u.sueldo || 0).toFixed(2)
             tr.innerHTML = `
               <td class="py-3 px-4 text-bread-700">${u.id}</td>
               <td class="py-3 px-4 text-bread-700">${u.username}</td>
               <td class="py-3 px-4">${adminBadge}</td>
+              <td class="py-3 px-4 text-bread-700 font-medium">$${saldo}</td>
               <td class="py-3 px-4 text-right">
                 <div class="flex justify-end items-center space-x-2">
+                  <button data-action="edit-saldo" data-id="${u.id}" data-saldo="${saldo}" class="px-3 py-1 border rounded text-sm bg-green-50 hover:bg-green-100 text-green-700">Editar Saldo</button>
                   <button data-action="toggle-admin" data-id="${u.id}" class="px-3 py-1 border rounded text-sm">${u.admin ? 'Quitar admin' : 'Hacer admin'}</button>
                   <button data-action="delete-user" data-id="${u.id}" class="px-3 py-1 border rounded text-sm text-red-500">Eliminar</button>
                 </div>
@@ -1519,7 +1540,7 @@
           }
         } catch (err) {
           console.error('Error cargando usuarios:', err)
-          tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-red-500">Error al cargar usuarios</td></tr>'
+          tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-red-500">Error al cargar usuarios</td></tr>'
         }
       }
 
@@ -1529,6 +1550,41 @@
         const action = btn.dataset.action
         const id = btn.dataset.id
         if (!action || !id) return
+        
+        if (action === 'edit-saldo') {
+          const saldoActual = btn.dataset.saldo
+          const nuevoSaldo = prompt(`Ingresa el nuevo saldo para este usuario:\nSaldo actual: $${saldoActual}`, saldoActual)
+          if (nuevoSaldo === null) return
+          
+          const saldoNum = Number(nuevoSaldo)
+          if (isNaN(saldoNum) || saldoNum < 0) {
+            alert('El saldo debe ser un número positivo')
+            return
+          }
+          
+          try {
+            const res = await fetch(`/admin/users/${id}/update-saldo`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nuevoSaldo: saldoNum })
+            })
+            
+            if (!res.ok) {
+              const error = await res.json()
+              alert(error.mensaje || 'Error al actualizar saldo')
+              return
+            }
+            
+            const data = await res.json()
+            globalThis.mostrarToast(`Saldo actualizado: $${data.nuevoSaldo}`)
+            await loadAdminUsers()
+          } catch (err) {
+            console.error(err)
+            alert('Error al actualizar saldo')
+          }
+          return
+        }
+        
         if (action === 'toggle-admin') {
           if (!confirm('Cambiar rol admin de este usuario?')) return
           try {
