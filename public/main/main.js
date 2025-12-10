@@ -509,12 +509,6 @@
       console.error('Error loading user purchases:', error)
       tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-red-500">Error al cargar compras</td></tr>'
     }
-    
-    // Recargar automáticamente cada 10 segundos
-    setTimeout(() => {
-      const tbodyCheck = document.getElementById('userPurchasesTbody')
-      if (tbodyCheck) loadUserPurchases()
-    }, 10000)
   }
 
   // Función para cargar todas las compras (admin)
@@ -566,12 +560,6 @@
       console.error('Error loading all purchases:', error)
       tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-red-500">Error al cargar compras</td></tr>'
     }
-    
-    // Recargar automáticamente cada 10 segundos
-    setTimeout(() => {
-      const tbodyCheck = document.getElementById('allPurchasesTbody')
-      if (tbodyCheck) loadAllPurchases()
-    }, 10000)
   }
 
   // Función para mostrar detalles de compra (usuario)

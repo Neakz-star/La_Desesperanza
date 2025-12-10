@@ -142,8 +142,11 @@
                 
                 <!-- Subsección: Mis Compras -->
                 <div class="mb-6">
-                    <div class="mb-4">
+                    <div class="mb-4 flex justify-between items-center">
                         <h3 class="text-lg font-medium text-bread-600">Mis Compras</h3>
+                        <button onclick="loadUserPurchases()" class="bg-bread-500 text-white px-4 py-2 rounded hover:bg-bread-600 transition-colors">
+                            <i class="fas fa-sync-alt mr-2"></i>Actualizar
+                        </button>
                     </div>
                     <div class="overflow-x-auto bg-white rounded-lg p-4 shadow-sm">
                         <table class="min-w-full">
@@ -164,8 +167,11 @@
 
                 <!-- Subsección: Todas las Compras (Solo para Admin) -->
                 <div>
-                    <div class="mb-4">
+                    <div class="mb-4 flex justify-between items-center">
                         <h3 class="text-lg font-medium text-bread-600">Compras Usuarios</h3>
+                        <button onclick="loadAllPurchases()" class="bg-bread-500 text-white px-4 py-2 rounded hover:bg-bread-600 transition-colors">
+                            <i class="fas fa-sync-alt mr-2"></i>Actualizar
+                        </button>
                     </div>
                     <div class="overflow-x-auto bg-white rounded-lg p-4 shadow-sm">
                         <table class="min-w-full">
@@ -260,8 +266,20 @@
                         </div>
                         <div>
                             <label for="productSeason" class="block text-sm font-medium text-bread-600">Temporada</label>
-                            <input type="text" id="productSeason" placeholder="Ej: Primavera" 
+                            <select id="productSeason" 
                                 class="mt-1 block w-full px-3 py-2 border border-bread-200 rounded-md shadow-sm focus:outline-none focus:ring-bread-500 focus:border-bread-500">
+                                <option value="">Sin temporada</option>
+                                <option value="Navidad">Navidad</option>
+                                <option value="Halloween">Halloween</option>
+                                <option value="San Valentín">San Valentín</option>
+                                <option value="Día de Muertos">Día de Muertos</option>
+                                <option value="Pascua">Pascua</option>
+                                <option value="Día de Reyes">Día de Reyes</option>
+                                <option value="Primavera">Primavera</option>
+                                <option value="Verano">Verano</option>
+                                <option value="Otoño">Otoño</option>
+                                <option value="Invierno">Invierno</option>
+                            </select>
                         </div>
                     </div>
                     <div class="flex justify-end space-x-3">

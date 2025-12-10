@@ -281,8 +281,11 @@
             <h2 class="text-4xl font-light text-center text-bread-700 mb-16">Mis Compras</h2>
             <div class="max-w-6xl mx-auto">
                 <div class="bg-white rounded-lg shadow-sm p-6">
-                    <div class="mb-6">
+                    <div class="mb-6 flex justify-between items-center">
                         <h3 class="text-xl font-light text-bread-700">Historial de Compras</h3>
+                        <button onclick="loadUserPurchasesPublic()" class="bg-bread-500 text-white px-4 py-2 rounded hover:bg-bread-600 transition-colors">
+                            <i class="fas fa-sync-alt mr-2"></i>Actualizar
+                        </button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full">
