@@ -272,7 +272,15 @@ app.post('/saldo/agregar', async (req, res) => {
 		// Actualizar saldo
 		await pool.execute('UPDATE usuario SET sueldo = ? WHERE id = ?', [nuevoSaldo, req.session.userId])
 
+		console.log('✅ Saldo actualizado:', {
+			userId: req.session.userId,
+			saldoAnterior: saldoActual,
+			montoAgregado: montoNum,
+			nuevoSaldo: nuevoSaldo
+		})
+
 		res.json({ 
+			success: true,
 			mensaje: 'Saldo agregado correctamente', 
 			saldoAnterior: saldoActual.toFixed(2),
 			montoAgregado: montoNum.toFixed(2),
@@ -281,9 +289,9 @@ app.post('/saldo/agregar', async (req, res) => {
 	} catch (err) {
 		console.error('Error al agregar saldo:', err)
 		if (err.code && (err.code.startsWith('ER_') || err.code === 'ECONNREFUSED')) {
-			return res.status(500).json({ mensaje: 'Error de conexión con la base de datos' })
+			return res.status(500).json({ success: false, mensaje: 'Error de conexión con la base de datos' })
 		}
-		res.status(500).json({ mensaje: 'Error al agregar saldo' })
+		res.status(500).json({ success: false, mensaje: 'Error al agregar saldo' })
 	}
 })
 
