@@ -496,6 +496,45 @@
         </div>
     </div>
 
+    <!-- Modal para editar saldo -->
+    <div id="editSaldoModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg p-8 max-w-md w-full">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-light text-bread-700">Editar Saldo</h2>
+                    <button onclick="closeEditSaldoModal()" class="text-bread-500 hover:text-bread-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="editSaldoForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-bread-600 mb-2">Usuario</label>
+                        <p id="editSaldoUsername" class="text-bread-700 font-medium"></p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-bread-600 mb-2">Saldo Actual</label>
+                        <p id="editSaldoActual" class="text-bread-700 text-lg">$0.00</p>
+                    </div>
+                    <div>
+                        <label for="editSaldoInput" class="block text-sm font-medium text-bread-600 mb-2">Nuevo Saldo</label>
+                        <input type="number" id="editSaldoInput" step="0.01" min="0" placeholder="0.00" required
+                            class="w-full px-4 py-2 border border-bread-200 rounded-md shadow-sm focus:outline-none focus:ring-bread-500 focus:border-bread-500">
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="closeEditSaldoModal()"
+                            class="px-4 py-2 border border-bread-500 text-bread-500 rounded hover:bg-bread-50 transition-colors">
+                            Cancelar
+                        </button>
+                        <button type="submit"
+                            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+                            <i class="fas fa-save mr-2"></i>Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal para ticket -->
     <div id="ticketModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="min-h-screen flex items-center justify-center p-4">

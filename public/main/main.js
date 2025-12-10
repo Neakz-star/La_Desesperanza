@@ -1518,7 +1518,7 @@
               <td class="py-3 px-4 text-bread-700 font-medium">$${saldo}</td>
               <td class="py-3 px-4 text-right">
                 <div class="flex justify-end items-center space-x-2">
-                  <button data-action="edit-saldo" data-id="${u.id}" data-saldo="${saldo}" class="px-3 py-1 border rounded text-sm bg-green-50 hover:bg-green-100 text-green-700">Editar Saldo</button>
+                  <button data-action="edit-saldo" data-id="${u.id}" data-saldo="${saldo}" data-username="${u.username}" class="px-3 py-1 border rounded text-sm bg-green-50 hover:bg-green-100 text-green-700">Editar Saldo</button>
                   <button data-action="toggle-admin" data-id="${u.id}" class="px-3 py-1 border rounded text-sm">${u.admin ? 'Quitar admin' : 'Hacer admin'}</button>
                   <button data-action="delete-user" data-id="${u.id}" class="px-3 py-1 border rounded text-sm text-red-500">Eliminar</button>
                 </div>
@@ -1540,36 +1540,9 @@
         if (!action || !id) return
         
         if (action === 'edit-saldo') {
+          const username = btn.dataset.username || 'Usuario'
           const saldoActual = btn.dataset.saldo
-          const nuevoSaldo = prompt(`Ingresa el nuevo saldo para este usuario:\nSaldo actual: $${saldoActual}`, saldoActual)
-          if (nuevoSaldo === null) return
-          
-          const saldoNum = Number(nuevoSaldo)
-          if (isNaN(saldoNum) || saldoNum < 0) {
-            alert('El saldo debe ser un número positivo')
-            return
-          }
-          
-          try {
-            const res = await fetch(`/admin/users/${id}/update-saldo`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ nuevoSaldo: saldoNum })
-            })
-            
-            if (!res.ok) {
-              const error = await res.json()
-              alert(error.mensaje || 'Error al actualizar saldo')
-              return
-            }
-            
-            const data = await res.json()
-            globalThis.mostrarToast(`Saldo actualizado: $${data.nuevoSaldo}`)
-            await loadAdminUsers()
-          } catch (err) {
-            console.error(err)
-            alert('Error al actualizar saldo')
-          }
+          openEditSaldoModal(id, username, saldoActual)
           return
         }
         
@@ -1674,6 +1647,62 @@
     function escapeHtml(s) {
       if (!s) return ''
       return String(s).replace(/'/g, "\\'").replace(/\"/g, '\\"')
+    }
+
+    // Funciones para el modal de editar saldo
+    let editSaldoUserId = null
+
+    globalThis.openEditSaldoModal = function(userId, username, saldoActual) {
+      editSaldoUserId = userId
+      document.getElementById('editSaldoUsername').textContent = username
+      document.getElementById('editSaldoActual').textContent = `$${Number(saldoActual).toFixed(2)}`
+      document.getElementById('editSaldoInput').value = saldoActual
+      document.getElementById('editSaldoModal').classList.remove('hidden')
+    }
+
+    globalThis.closeEditSaldoModal = function() {
+      document.getElementById('editSaldoModal').classList.add('hidden')
+      document.getElementById('editSaldoForm').reset()
+      editSaldoUserId = null
+    }
+
+    // Manejar envío del formulario de editar saldo
+    const editSaldoForm = document.getElementById('editSaldoForm')
+    if (editSaldoForm) {
+      editSaldoForm.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        
+        if (!editSaldoUserId) return
+        
+        const nuevoSaldo = Number(document.getElementById('editSaldoInput').value)
+        
+        if (isNaN(nuevoSaldo) || nuevoSaldo < 0) {
+          mostrarToast('El saldo debe ser un número positivo')
+          return
+        }
+        
+        try {
+          const res = await fetch(`/admin/users/${editSaldoUserId}/update-saldo`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nuevoSaldo })
+          })
+          
+          if (!res.ok) {
+            const error = await res.json()
+            mostrarToast(error.mensaje || 'Error al actualizar saldo')
+            return
+          }
+          
+          const data = await res.json()
+          mostrarToast(`✅ Saldo actualizado: $${data.nuevoSaldo.toFixed(2)}`)
+          closeEditSaldoModal()
+          await loadAdminUsers()
+        } catch (err) {
+          console.error(err)
+          mostrarToast('Error al actualizar saldo')
+        }
+      })
     }
 
     async function loadAdminProducts() {
